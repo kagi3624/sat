@@ -9,6 +9,5 @@
 int main (int argc, char **argv){
 
 	srand48(time(NULL));
-	
-	
+
 }
