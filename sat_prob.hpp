@@ -4,7 +4,6 @@
 #include <vector>
 #include <iostream>
 
-//literals and clauses indexing starts at 1!
 
 struct clause{
 
@@ -14,6 +13,9 @@ struct clause{
 
 	void print_clause();
 	void set_num_literals(unsigned int const &x);
+	unsigned int get_num_literals();
+	
+	clause():num_literals(0){}
 	
 	private:
 	std::vector <int> v;
@@ -32,8 +34,12 @@ public:
 	void remove_clause (std::size_t i);
 	clause get_clause(std::size_t i) const;
 	void print_problem();
+	
+	void set_num_variables (unsigned int x);
 	unsigned int get_num_clauses() const;
 	unsigned int get_num_variables() const;
+	
+	int range_value(std::size_t i);
 	
 	sat_prob(unsigned int x = 0, unsigned int y = 0, double p = 0.5);
 	

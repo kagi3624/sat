@@ -2,26 +2,41 @@
 
 void clause::print_clause(){
 	
-	for(std::size_t i=1; i<=v.size();++i){
-			if(get_literal(i)<0 && i == v.size())
-				std::cout<<"\u0304x"<<-get_literal(i)<<'\n';
-			else if (get_literal(i)>0 && i == v.size())
-				std::cout<<'x'<<get_literal(i)<<'\n';
-			else if (get_literal(i)<0)
-				std::cout<<"\u0304x"<<-get_literal(i)<<" \u2228 ";
+	for(std::size_t i=0; i<v.size();++i){
+			if(v[i]<0 && i == v.size()-1)
+				std::cout<<"\u0304x"<<-v[i]<<'\n';
+			else if (v[i]>0 && i == v.size()-1)
+				std::cout<<'x'<<v[i]<<'\n';
+			else if (v[i]<0)
+				std::cout<<"\u0304x"<<-v[i]<<" \u2228 ";
 			else 
-				std::cout<<'x'<<get_literal(i)<<" \u2228 ";
+				std::cout<<'x'<<v[i]<<" \u2228 ";
 	}
 };
 
 
 void clause::add_literal (int const &x){
-	if(x==0) std::cerr<<"The indexing of literals beginns at 1. Don't try to add zeros to the clause!\n";
-	else
+	if(x==0) std::cerr<<"literal indexing beginns with 1!\n";
+	else{
 		v.push_back(x);
+		num_literals+=1;
+	}
 }
-int clause::get_literal (std::size_t i)const{return v[i-1];}
+
+
+int clause::get_literal (std::size_t i)const{
+	return v[i];
+}
 void clause::set_num_literals(unsigned int const &x){num_literals=x;};
+unsigned int clause::get_num_literals(){
+	
+	if(num_literals!=v.size()){
+		std::cerr<<"Number of stored literals doesn't match the given number of literals!\n";
+		return 0;
+	}
+	return num_literals;
+
+}
 
 
 
@@ -33,14 +48,26 @@ void sat_prob::add_clause(clause const& f){
 }
 
 void sat_prob::print_problem(){
-	for (unsigned int i = 0; i<problem.size();++i)
+	for (unsigned int i = 0; i<problem.size();++i){
+		std::cout<<"c"<<i+1<<": ";
 		problem[i].print_clause();
+		
+	}
 };
 
 
-clause sat_prob::get_clause(std::size_t i) const {return problem[i-1];}
+clause sat_prob::get_clause(std::size_t i) const {return problem[i];}
 
+void sat_prob::set_num_variables(unsigned int x){num_variables=x;}
 unsigned int sat_prob::get_num_clauses() const {return num_clauses;}
 unsigned int sat_prob::get_num_variables() const {return num_variables;}
+
+int sat_prob::range_value(std::size_t i){
+	int z = 0;
+	for(unsigned int t = 0; t<problem[i].get_num_literals();++t)
+		if(problem[i].get_literal(t)<0)
+			z++;
+	return(1-z);
+}
 
 sat_prob::sat_prob(unsigned int x, unsigned int y, double p): num_variables(x), num_clauses(y), probability(p){}
