@@ -1,5 +1,7 @@
 #include "sat_prob.hpp"
 
+clause::clause(unsigned int x):num_literals(x){}
+
 void clause::print_clause(){
 	
 	for(std::size_t i=0; i<v.size();++i){
@@ -61,6 +63,7 @@ clause sat_prob::get_clause(std::size_t i) const {return problem[i];}
 void sat_prob::set_num_variables(unsigned int x){num_variables=x;}
 unsigned int sat_prob::get_num_clauses() const {return num_clauses;}
 unsigned int sat_prob::get_num_variables() const {return num_variables;}
+double sat_prob::get_probability() const {return probability;}
 
 int sat_prob::range_value(std::size_t i){
 	int z = 0;

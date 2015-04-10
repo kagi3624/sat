@@ -6,19 +6,20 @@
 
 
 struct clause{
-
+	std::vector <int> v;
 	
 	void add_literal (int const &x);
 	int get_literal (std::size_t i) const;
 
 	void print_clause();
 	void set_num_literals(unsigned int const &x);
+	
 	unsigned int get_num_literals();
 	
-	clause():num_literals(0){}
+	clause(unsigned int x = 0);
+	
 	
 	private:
-	std::vector <int> v;
 	unsigned int num_literals;
 };
 
@@ -38,6 +39,7 @@ public:
 	void set_num_variables (unsigned int x);
 	unsigned int get_num_clauses() const;
 	unsigned int get_num_variables() const;
+	double get_probability() const;
 	
 	int range_value(std::size_t i);
 	
