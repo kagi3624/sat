@@ -38,11 +38,17 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 
 int main (int argc, char **argv){
 
-
+	int num_variables, num_literals, num_clauses, exact = 0;
+	num_variables = atoi(argv[1]);
+	num_clauses   = atoi(argv[2]);
+	num_literals  = atoi(argv[3]);
+	
+	if(argc>4)
+		exact     = atoi(argv[4]);
 	
 	sat_prob A;
 	
-	randomize_prob(A,20,100);
+	randomize_prob(A,num_variables,num_clauses,num_literals,exact);
 	
 	IloEnv   env;
 	try{
@@ -83,6 +89,6 @@ int main (int argc, char **argv){
 
 	env.end(); 
 	
-	//A.print_problem();
+	A.print_problem();
 
 }

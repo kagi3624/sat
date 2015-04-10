@@ -1,4 +1,7 @@
 #include "randomize_prob.hpp"
+
+using namespace boost::random;
+
 bool vec_not_stored(sat_prob &A, std::vector<int> &T){
 	if(A.get_num_clauses()==0)
 		return true;
@@ -11,8 +14,8 @@ bool vec_not_stored(sat_prob &A, std::vector<int> &T){
 }
 
 template <typename URNG>
-void fill_vec(std::vector<int> &v, int N, double p, URNG&& g){
-	std::uniform_real_distribution<> dis(0, 1);
+void fill_vec(std::vector<int> &v, unsigned int N, double p, URNG& g){
+	uniform_real_distribution<> dis(0, 1);
 	for(unsigned int i = 0; i<N;++i){
 		if(dis(g)<p)
 			v.push_back(-(i+1));
@@ -22,35 +25,34 @@ void fill_vec(std::vector<int> &v, int N, double p, URNG&& g){
 }
 
 template <typename RandomIt, typename URNG>
-void partial_shuffle(RandomIt first, RandomIt mid, RandomIt last, URNG&& g) {
+void partial_shuffle(RandomIt first, RandomIt mid, RandomIt last, URNG& g) {
   auto n = last - first;
   auto k = mid - first;
   for (decltype(n) i{}; i < k; ++i) {
-    auto j = std::uniform_int_distribution<decltype(i)>(i, n - 1)(g);
+    auto j = uniform_int_distribution<decltype(i)>(i, n - 1)(g);
     using std::swap;
     swap(first[i], first[j]);
   }
 }
 
-void randomize_prob(sat_prob &A, unsigned int num_var, unsigned int num_cl, unsigned int num_lit){
+void randomize_prob(sat_prob &A, unsigned int num_var, unsigned int num_cl, unsigned int num_lit, int exact){
 
 	try{
 		if(A.get_num_variables() != 0 || A.get_num_clauses() != 0) throw "Error: SAT problem should be empty. Use the default constructor for creating one!";
 		
-		std::mt19937::result_type seed = time(0);
-		std::mt19937 gen(seed);
+		mt19937::result_type seed = time(0);
+		mt19937 gen(seed);
 
 		A.set_num_variables(num_var);
 		if(num_lit==0){
-			std::uniform_int_distribution<int> random_num_literals(1,num_var);
+			uniform_int_distribution<int> random_num_literals(1,num_var);
 			for(unsigned int n = 0; n<num_cl;++n){
 				unsigned int k = random_num_literals(gen);
 				clause a(k);
 				std::vector<int> T;
 				fill_vec(T, num_var, A.get_probability(), gen);
 				partial_shuffle(T.begin(), T.begin()+k, T.end(), gen);
-				std::vector<int>   sub(T.begin(),T.begin()+k);
-				a.v = sub;
+				a.v.assign(T.begin(),T.begin()+k); 
 				A.add_clause(a);
 			}
 		}
@@ -69,9 +71,28 @@ void randomize_prob(sat_prob &A, unsigned int num_var, unsigned int num_cl, unsi
 				}
 			}
 		}
-		/*else{
-			return;
-		}*/
+		else if(exact == 0){
+			uniform_int_distribution<int> random_num_literals(1,num_lit);
+			for(unsigned int n = 0; n<num_cl;++n){
+				unsigned int k = random_num_literals(gen);
+				clause a(k);
+				std::vector<int> T;
+				fill_vec(T, num_var, A.get_probability(), gen);
+				partial_shuffle(T.begin(), T.begin()+k, T.end(), gen);
+				a.v.assign(T.begin(),T.begin()+k); 
+				A.add_clause(a);
+			}
+		}
+		else{
+			for(unsigned int n = 0; n<num_cl;++n){
+				clause a(num_lit);
+				std::vector<int> T;
+				fill_vec(T, num_var, A.get_probability(), gen);
+				partial_shuffle(T.begin(), T.begin()+num_lit, T.end(), gen);
+				a.v.assign(T.begin(),T.begin()+num_lit); 
+				A.add_clause(a);
+			}
+		}
 	}
 	catch(char const* s){
 		std::cerr<<s<<'\n';
