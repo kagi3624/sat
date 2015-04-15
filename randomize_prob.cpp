@@ -40,7 +40,7 @@ void randomize_prob(sat_prob &A, unsigned int num_var, unsigned int num_cl, unsi
 	try{
 		if(A.get_num_variables() != 0 || A.get_num_clauses() != 0) throw "Error: SAT problem should be empty. Use the default constructor for creating one!";
 		
-		mt19937::result_type seed = time(0);
+		mt19937::result_type seed = 70;//time(0);
 		mt19937 gen(seed);
 
 		A.set_num_variables(num_var);
