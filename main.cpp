@@ -67,7 +67,7 @@ int main (int argc, char **argv){
 		
 		
 			
-		//A.print_problem();
+		A.print_problem();
 		std::vector<int> t =solve_asat(A,0.01);
 		
 		if (!i){
