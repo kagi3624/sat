@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include "randomize_prob.hpp"
+#include "asat.hpp"
 
 ILOSTLBEGIN
 
@@ -37,21 +38,21 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 
 
 int main (int argc, char **argv){
-
-	int num_variables, num_literals, num_clauses, exact = 0;
-	num_variables = atoi(argv[1]);
-	num_clauses   = atoi(argv[2]);
-	num_literals  = atoi(argv[3]);
-	
-	if(argc>4)
-		exact     = atoi(argv[4]);
-	
-	sat_prob A;
-	
-	randomize_prob(A,num_variables,num_clauses,num_literals,exact);
-	
 	IloEnv   env;
 	try{
+		int num_variables, num_literals, num_clauses, exact = 0;
+		num_variables = atoi(argv[1]);
+		num_clauses   = atoi(argv[2]);
+		num_literals  = atoi(argv[3]);
+		
+		if(num_literals>num_variables) throw "Error: Number of variables can't be lower than the number of literals!";
+		
+		if(argc>4)
+			exact     = atoi(argv[4]);
+	
+		sat_prob A;
+	
+		randomize_prob(A,num_variables,num_clauses,num_literals,exact);
 		
 		IloModel model(env);
 
@@ -64,6 +65,10 @@ int main (int argc, char **argv){
 		int i = cplex.solve();
 		cplex.exportModel("lpex1.lp");
 		
+		
+			
+		A.print_problem();
+		std::vector<int> t =solve_asat(A,0.01);
 		
 		if (!i){
 			env.out() << "Solution status = " << cplex.getStatus() << endl;
@@ -83,12 +88,12 @@ int main (int argc, char **argv){
 		env.error() << "Failed to optimize LP" << endl;
  		cerr << "Concert exception caught: " << e <<'\n';
 	}
+	catch(char const* s){
+		std::cerr<<s<<'\n';
+	}
 	catch (...) {
       cerr << "Unknown exception caught" <<'\n';
 	}
-
 	env.end(); 
-	
-	A.print_problem();
 
 }
