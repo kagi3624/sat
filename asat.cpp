@@ -15,11 +15,11 @@ std::pair<std::vector<int>, int> find_unsatisfied_clauses(sat_prob &A, std::vect
 		int r_value = 1;
 		for(unsigned int j = 0; j<A.get_clause(i).v.size();++j){
 			if(A.get_clause(i).get_literal(j)<0){
-				l_value -= conf[-A.get_clause(i).get_literal(j)];
+				l_value -= conf[-A.get_clause(i).get_literal(j)-1];
 				r_value--;
 			}
 			else
-				l_value += conf[A.get_clause(i).get_literal(j)];
+				l_value += conf[A.get_clause(i).get_literal(j)-1];
 		}
 		if(l_value<r_value){
 			N++;
@@ -39,8 +39,12 @@ std::vector<int> solve_asat (sat_prob &A, double p){
 	
 	//initial configuration
 	std::vector<int> init_conf;
-	for (unsigned int i = 0; i<A.get_num_variables();++i)
+	for(unsigned int i = 0; i<A.get_num_variables();++i)
 		init_conf.push_back(uniform_int_distribution<>(0, 1)(g));
+	
+	for(unsigned int i = 0; i<init_conf.size();++i)
+		std::cout<<init_conf[i]<<" ";
+	std::cout<<'\n';
 	
 	std::pair<std::vector<int>, int> P = find_unsatisfied_clauses(A,init_conf);
 	std::vector<int> configuration;
