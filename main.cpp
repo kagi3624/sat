@@ -67,8 +67,11 @@ int main (int argc, char **argv){
 		
 		
 			
-		A.print_problem();
-		std::vector<int> t =solve_asat(A,0.01);
+		//A.print_problem();
+		std::vector<int> t =solve_asat(A,0.2);
+		for(std::size_t i; i<t.size();++i)
+			std::cout<<t[i]<<" ";
+		std::cout<<'\n';
 		
 		if (!i){
 			env.out() << "Solution status = " << cplex.getStatus() << endl;
