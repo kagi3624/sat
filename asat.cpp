@@ -26,9 +26,8 @@ std::pair<std::vector<int>, int> find_unsatisfied_clauses(sat_prob &A, std::vect
 			uns_cl.push_back(i);
 		}
 	}
-	std::pair<std::vector<int>, int> K;
-	K = std::make_pair(uns_cl,N);
-	return K;
+
+	return std::make_pair(uns_cl,N);
 }
 
 
@@ -37,20 +36,45 @@ std::vector<int> solve_asat (sat_prob &A, double p){
 	mt19937::result_type seed = 6;
 	mt19937 g(seed);
 	
-	//initial configuration
-	std::vector<int> init_conf;
-	for(unsigned int i = 0; i<A.get_num_variables();++i)
-		init_conf.push_back(uniform_int_distribution<>(0, 1)(g));
-	
-	for(unsigned int i = 0; i<init_conf.size();++i)
-		std::cout<<init_conf[i]<<" ";
-	std::cout<<'\n';
-	
-	std::pair<std::vector<int>, int> P = find_unsatisfied_clauses(A,init_conf);
+	//roll initial configuration
 	std::vector<int> configuration;
-	std::cout<<P.first.size()<<" "<<P.second<<'\n';
-	for(int i = 0;i<P.first.size();++i)
-		std::cout<<P.first[i]<<" ";
-	std::cout<<'\n';
+	unsigned int t=0, t_max = 1000;
+	for(unsigned int i = 0; i<A.get_num_variables();++i)
+		configuration.push_back(uniform_int_distribution<>(0, 1)(g));
+	std::vector<int> changed_configuration = configuration;
+
+	while(t<t_max){
+		std::pair<std::vector<int>, int> U = find_unsatisfied_clauses(A,configuration);
+		
+		if(U.second == 0)
+			return configuration;
+		
+		/*for(std::size_t i=0;i<U.first.size();++i)
+			std::cout<<U.first[i]<<" ";
+		std::cout<<'\n';*/
+		
+			
+		std::size_t w = uniform_int_distribution<>(0,U.first.size()-1)(g);
+		std::size_t z = uniform_int_distribution<>(0,A.get_clause(w).v.size()-1)(g);
+		
+		if(configuration[abs(A.get_clause(w).v[z])-1] == 0)	
+			changed_configuration[abs(A.get_clause(w).v[z])-1] = 1;
+		else
+			changed_configuration[abs(A.get_clause(w).v[z])-1] = 0;
+			
+		std::pair<std::vector<int>, int> R = find_unsatisfied_clauses(A,changed_configuration);
+		if(R.second<=U.second)
+			configuration[abs(A.get_clause(w).v[z])-1]=changed_configuration[abs(A.get_clause(w).v[z])-1];
+		else if(uniform_real_distribution<>(0.0,1.0)(g)<=p)
+			configuration[abs(A.get_clause(w).v[z])-1]=changed_configuration[abs(A.get_clause(w).v[z])-1];
+		
+		t++;
+	}
+	if(t==t_max)
+		std::cout<<"t_max reached\n";
+	std::cout<<"t="<<t<<'\n';
 	return configuration;
 }
+
+
+//./test 500 10000 450

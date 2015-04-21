@@ -42,6 +42,7 @@ public:
 	double get_probability() const;
 	
 	int range_value(std::size_t i);
+	void flip(std::size_t i,std::size_t j);
 	
 	sat_prob(unsigned int x = 0, unsigned int y = 0, double p = 0.5);
 	

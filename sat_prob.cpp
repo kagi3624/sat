@@ -73,4 +73,10 @@ int sat_prob::range_value(std::size_t i){
 	return(1-z);
 }
 
+void sat_prob::flip(std::size_t i,std::size_t j){
+
+	problem[i].v[j]=-problem[i].v[j];
+
+}
+
 sat_prob::sat_prob(unsigned int x, unsigned int y, double p): num_variables(x), num_clauses(y), probability(p){}
