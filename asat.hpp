@@ -10,6 +10,7 @@
 #include <boost/random/uniform_real_distribution.hpp>
 #include "sat_prob.hpp"
 
+std::vector<std::vector<int> > find_clauses_for_var(const sat_prob &A);
 std::vector<int> solve_asat (sat_prob &A, double p=0.3);
 
 #endif 
