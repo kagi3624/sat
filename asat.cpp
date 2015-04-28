@@ -69,12 +69,13 @@ std::vector<int> solve_asat (sat_prob &A, double p){
 	
 	//roll initial configuration
 	std::vector<int> R,U;
-	std::vector<int> configuration;
+	std::vector<int> configuration (A.get_num_variables());
 	
 	std::vector<std::vector<int> > CFx = find_clauses_for_var(A);
 
 	for(unsigned int i = 0; i<A.get_num_variables();++i)
 		configuration.push_back(uniform_int_distribution<>(0, 1)(g));
+	
 		
 	find_unsatisfied_clauses(A,configuration,U);
 
@@ -84,7 +85,7 @@ std::vector<int> solve_asat (sat_prob &A, double p){
 	
 		if(U.size() == 0){
 			//std::cout<<"t="<<t<<'\n';
-			find_unsatisfied_clauses(A,configuration,U);
+			//find_unsatisfied_clauses(A,configuration,U);
 			return configuration;	
 		}
 						
@@ -105,14 +106,16 @@ std::vector<int> solve_asat (sat_prob &A, double p){
 				configuration[x] = 1;
 			else
 				configuration[x] = 0;
-			std::cout<<"a  "<<R.size()<<" "<<U.size()<<"  "<<t<<'\n'<<std::flush;
+			std::cout<<"a  "<<R.size()<<" "<<U.size()<<"  "<<t<<'\n';
 		}
 
 		else{
-			t++;
-			std::cout<<"b  "<<R.size()<<" "<<U.size()<<"  "<<t<<'\n'<<std::flush;
-			U = R;
+			
+			std::cout<<"b  "<<R.size()<<" "<<U.size()<<"  "<<t<<'\n';
+			//U = R;
+			std::swap(U,R);
 		}
+		t++;
 	}
 	std::cout<<"t_max reached\n";
 	return configuration;

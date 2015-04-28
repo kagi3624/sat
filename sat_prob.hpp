@@ -29,11 +29,10 @@ class sat_prob{
 	double probability; 
    
 public:
-
  	
 	void add_clause(clause const& f);
-	void remove_clause (std::size_t i);
 	clause get_clause(std::size_t i) const;
+	unsigned int problem_size();
 	void print_problem();
 	
 	void set_num_variables (unsigned int x);

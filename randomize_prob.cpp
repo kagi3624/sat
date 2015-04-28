@@ -3,7 +3,7 @@
 using namespace boost::random;
 
 bool vec_not_stored(sat_prob &A, std::vector<int> &T){
-	if(A.get_num_clauses()==0)
+	if(A.problem_size()==0)
 		return true;
 	for(unsigned int i = 0; i<A.get_num_clauses();++i){
 		if(A.get_clause(i).v.size() ==T.size() && A.get_clause(i).v == T)
@@ -13,21 +13,29 @@ bool vec_not_stored(sat_prob &A, std::vector<int> &T){
 
 }
 
-template <typename URNG>
-void fill_vec(std::vector<int> &v, unsigned int N, double p, URNG& g){
+
+void fill_vec(std::vector<int> &v, unsigned int N){
+
 	v.resize(N);
-	uniform_real_distribution<> dis(0, 1);
 	
-	for(unsigned int i = 0; i<N;++i){
-		if(dis(g)<p)
-			v[i]=(-(i+1));
-		else
-			v[i]=i+1;
-		}
+	for(unsigned int i = 0; i<N;++i)
+		v[i]=i+1;
+		
 }
 
+template <typename URNG>
+void random_flip(std::vector<int> &v, const double p, URNG &g){
+	uniform_real_distribution<> rand_p(0,1);
+	for(std::size_t i = 0; i<v.size();++i)
+		if(rand_p(g)>p)
+			v[i]=-v[i];
+}
+
+
+
+
 template <typename RandomIt, typename URNG>
-void partial_shuffle(RandomIt first, RandomIt mid, RandomIt last, URNG& g) {
+void partial_shuffle(RandomIt first, RandomIt mid, RandomIt last, URNG &g) {
   auto n = last - first;
   auto k = mid - first;
   for (decltype(n) i{}; i < k; ++i) {
@@ -37,22 +45,42 @@ void partial_shuffle(RandomIt first, RandomIt mid, RandomIt last, URNG& g) {
   }
 }
 
-void randomize_prob(sat_prob &A, unsigned int num_var, unsigned int num_cl, unsigned int num_lit, int exact){
+/*template <typename Distribution, typename OutIt, typename URNG>
+void random_sample(Distribution& pool, std::size_t k, OutIt out, URNG &g, const double p) {
+  std::unordered_set<decltype(pool(g))> sample;
+  uniform_real_distribution<> rand_p(0,1);
+  while (sample.size() < k) {
+    auto elem = pool(g);
+    if (sample.insert(elem).second){
+			if(rand_p(g)<p)
+      	*out++ = -elem;
+      else
+      	*out++ = elem;
+    }
+  }
+}*/
+
+
+void randomize_prob(sat_prob &A, unsigned int num_lit, int exact){
 
 	try{
-		if(A.get_num_variables() != 0 || A.get_num_clauses() != 0) throw "Error: SAT problem should be empty. Use the default constructor for creating one!";
+		if(A.get_num_variables() == 0 || A.get_num_clauses() == 0) throw "Error: SAT problem should't be empty!";
+		
+		unsigned int num_var = A.get_num_variables();
+		unsigned int num_cl  = A.get_num_clauses();
 		
 		std::vector<int> T;
+		fill_vec(T, num_var);
 		mt19937::result_type seed = 70;//time(0);
 		mt19937 gen(seed);
 
-		A.set_num_variables(num_var);
+
+
 		if(num_lit==0){
 			uniform_int_distribution<int> random_num_literals(1,num_var);
 			for(unsigned int n = 0; n<num_cl;++n){
 				unsigned int k = random_num_literals(gen);
 				clause a(k);
-				fill_vec(T, num_var, A.get_probability(), gen);
 				partial_shuffle(T.begin(), T.begin()+k, T.end(), gen);
 				a.v.assign(T.begin(),T.begin()+k); 
 				A.add_clause(a);
@@ -60,42 +88,49 @@ void randomize_prob(sat_prob &A, unsigned int num_var, unsigned int num_cl, unsi
 		}
 
 		else if(num_lit==num_var){
-			if(num_cl>pow(2,num_var)) throw "Error: There are less possible clauses than the number choosen clauses!";
+			if(num_cl>pow(2,num_var)) throw "Error: There are less possible clauses than the number of choosen clauses!";
+			clause a(num_lit);
 			for(unsigned int n = 0; n<num_cl;++n){
 				bool store = false;
 				while(store == false){
-					clause a(num_lit);
-					fill_vec(a.v, num_var, A.get_probability(), gen);
+					random_flip(a.v,A.get_probability(),gen);	
 					if(vec_not_stored(A,a.v)){
 						A.add_clause(a);
 						store = true;
 					}
+					else;
+						random_flip(a.v,A.get_probability(),gen);	
 				}
 			}
 		}
-		else if (exact == 1 && num_lit<=1000){
-		
-			//TO DO
-		}
+		/*	
+		else if (exact == 1 && num_lit<=100){
+			uniform_int_distribution<> rand_num(1,num_var);
+			for(unsigned int  n = 0; n<num_cl;++n){
+				clause a(num_lit);
+				random_sample(rand_num,num_lit,std::back_inserter(a.v),gen,A.get_probability());
+				A.add_clause(a);
+				std::cout<<"clause added: "<<n<<'\n';
+			} 
+		}*/
 		else if(exact == 0){
 			uniform_int_distribution<int> random_num_literals(1,num_lit);
 			for(unsigned int n = 0; n<num_cl;++n){
 				unsigned int k = random_num_literals(gen);
-				clause a(k);
-				fill_vec(T, num_var, A.get_probability(), gen);
+				clause a(k);				
 				partial_shuffle(T.begin(), T.begin()+k, T.end(), gen);
 				a.v.assign(T.begin(),T.begin()+k); 
+				random_flip(a.v,A.get_probability(),gen);				
 				A.add_clause(a);
 			}
 		}
 		else{
 			for(unsigned int n = 0; n<num_cl;++n){
-				clause a(num_lit);
-				fill_vec(T, num_var, A.get_probability(), gen);
+				clause a(num_lit);		
 				partial_shuffle(T.begin(), T.begin()+num_lit, T.end(), gen);
 				a.v.assign(T.begin(),T.begin()+num_lit); 
+				random_flip(a.v,A.get_probability(),gen);	
 				A.add_clause(a);
-				std::cout<<"clause added: "<<n<<'\n';
 			}
 		}
 	}
