@@ -23,6 +23,7 @@ void fill_vec(std::vector<int> &v, unsigned int N){
 		
 }
 
+
 template <typename URNG>
 void random_flip(std::vector<int> &v, const double p, URNG &g){
 	uniform_real_distribution<> rand_p(0,1);
@@ -33,7 +34,7 @@ void random_flip(std::vector<int> &v, const double p, URNG &g){
 
 
 
-
+//PARTIAL SHUFFLE: generates n unique numbers form N via partial shuffling the elements of the vector
 template <typename RandomIt, typename URNG>
 void partial_shuffle(RandomIt first, RandomIt mid, RandomIt last, URNG &g) {
   auto n = last - first;
@@ -44,6 +45,8 @@ void partial_shuffle(RandomIt first, RandomIt mid, RandomIt last, URNG &g) {
     swap(first[i], first[j]);
   }
 }
+
+//RANDOM SAMPLE::generates n unique numbers from N numbers, should be only used if n<<N
 
 /*template <typename Distribution, typename OutIt, typename URNG>
 void random_sample(Distribution& pool, std::size_t k, OutIt out, URNG &g, const double p) {
@@ -61,7 +64,7 @@ void random_sample(Distribution& pool, std::size_t k, OutIt out, URNG &g, const 
 }*/
 
 
-void randomize_prob(sat_prob &A, unsigned int num_lit, int exact){
+void randomize_prob(sat_prob &A, unsigned int s, unsigned int num_lit, int exact){
 
 	try{
 		if(A.get_num_variables() == 0 || A.get_num_clauses() == 0) throw "Error: SAT problem should't be empty!";
@@ -71,7 +74,8 @@ void randomize_prob(sat_prob &A, unsigned int num_lit, int exact){
 		
 		std::vector<int> T;
 		fill_vec(T, num_var);
-		mt19937::result_type seed = 70;//time(0);
+		
+		mt19937::result_type seed = s;
 		mt19937 gen(seed);
 
 
@@ -93,26 +97,15 @@ void randomize_prob(sat_prob &A, unsigned int num_lit, int exact){
 			for(unsigned int n = 0; n<num_cl;++n){
 				bool store = false;
 				while(store == false){
-					random_flip(a.v,A.get_probability(),gen);	
-					if(vec_not_stored(A,a.v)){
+					random_flip(T,A.get_probability(),gen);	
+					if(vec_not_stored(A,T)){
+						a.v = T;
 						A.add_clause(a);
 						store = true;
 					}
-					else;
-						random_flip(a.v,A.get_probability(),gen);	
 				}
 			}
 		}
-		/*	
-		else if (exact == 1 && num_lit<=100){
-			uniform_int_distribution<> rand_num(1,num_var);
-			for(unsigned int  n = 0; n<num_cl;++n){
-				clause a(num_lit);
-				random_sample(rand_num,num_lit,std::back_inserter(a.v),gen,A.get_probability());
-				A.add_clause(a);
-				std::cout<<"clause added: "<<n<<'\n';
-			} 
-		}*/
 		else if(exact == 0){
 			uniform_int_distribution<int> random_num_literals(1,num_lit);
 			for(unsigned int n = 0; n<num_cl;++n){

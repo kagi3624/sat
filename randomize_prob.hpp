@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RANDOMIZE PROB:: Generates given number of random clauses with given number of literals for a class A.				 //                                                                                                         
+//                  If exact is zero or not given than the length of the clause is random between 1 and num_lit //                                                                                                                       
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef randomize_prob_HPP
 #define randomize_prob_HPP
 
@@ -12,7 +17,8 @@
 #include "sat_prob.hpp"
 
 
-//if no k is passed as argument the number of literals in each clause is random
-void randomize_prob(sat_prob &A, unsigned int num_lit=0, int exact = 0);
+
+
+void randomize_prob(sat_prob &A, unsigned int s = 1717, unsigned int num_lit=0, int exact = 0);
 
 #endif

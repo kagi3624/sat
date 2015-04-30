@@ -2,9 +2,36 @@
 
 using namespace boost::random;
 
-//returns the indices of unsatisfied clauses
 
-void find_unsatisfied_clauses(const sat_prob &A, const std::vector<int> &conf, std::vector<int> &R){
+
+std::vector<int> solve_by_asat (sat_prob &A, unsigned int s, double p){
+
+	mt19937::result_type seed = s;
+	mt19937 g(seed);
+	
+	std::vector<int> configuration (A.get_num_variables());
+	
+	for(size_t i = 0; i<A.get_num_variables();++i)
+		configuration[i] = uniform_int_distribution<>(0, 1)(g);
+	
+	for(size_t i = 0; i<A.get_num_clauses();++i)
+		for(siize_t j = 0; j<A.get_clause(i).v[j];++j){
+			
+		
+		
+		
+		}
+	
+	
+	return configuration;
+}
+
+
+
+
+
+
+/*void find_unsatisfied_clauses(const sat_prob &A, const std::vector<int> &conf, std::vector<int> &R){
 
 
 	for(unsigned int i = 0; i<A.get_num_clauses();++i){
@@ -119,5 +146,5 @@ std::vector<int> solve_asat (sat_prob &A, double p){
 	}
 	std::cout<<"t_max reached\n";
 	return configuration;
-}
+}*/
 

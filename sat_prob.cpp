@@ -43,10 +43,7 @@ unsigned int clause::get_num_literals(){
 
 
 void sat_prob::add_clause(clause const& f){
-	num_clauses += 1;
 	problem.push_back(f);
-	if(num_clauses!=problem.size())
-		std::cerr<<"Number of stored clauses doesn't match the given number of clauses!\n";
 }
 
 void sat_prob::print_problem(){
@@ -59,6 +56,7 @@ void sat_prob::print_problem(){
 
 
 clause sat_prob::get_clause(std::size_t i) const {return problem[i];}
+unsigned int sat_prob::problem_size(){return problem.size();}
 
 void sat_prob::set_num_variables(unsigned int x){num_variables=x;}
 unsigned int sat_prob::get_num_clauses() const {return num_clauses;}
@@ -79,4 +77,8 @@ void sat_prob::flip(std::size_t i,std::size_t j){
 
 }
 
-sat_prob::sat_prob(unsigned int x, unsigned int y, double p): num_variables(x), num_clauses(y), probability(p){}
+sat_prob::sat_prob(unsigned int x, unsigned int y, double p): num_variables(x), num_clauses(y), probability(p){
+
+	problem.reserve(num_clauses);
+
+}
