@@ -15,7 +15,7 @@ std::vector<int> solve_by_asat (sat_prob &A, unsigned int s, double p){
 		configuration[i] = uniform_int_distribution<>(0, 1)(g);
 	
 	for(size_t i = 0; i<A.get_num_clauses();++i)
-		for(siize_t j = 0; j<A.get_clause(i).v[j];++j){
+		for(size_t j = 0; j<A.get_clause(i).v.size();++j){
 			
 		
 		
