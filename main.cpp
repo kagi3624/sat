@@ -43,7 +43,7 @@ int main (int argc, char **argv){
 
 	
 	
-	IloEnv   env;
+	//IloEnv   env;
 	try{
 	
 		namespace po = boost::program_options;
@@ -78,13 +78,15 @@ int main (int argc, char **argv){
 		sat_prob A(num_variables,num_clauses);
 	
 		randomize_prob(A,seed,num_literals,exact);
-		A.print_problem();
+		
+		//A.print_problem();
 
 		std::vector<int> t = solve_by_asat(A,seed,0.21);
 		for(size_t i = 0; i<t.size();++i)
 			std::cout<<t[i]<<" ";
 		std::cout<<'\n';
 		
+		/*
 		IloModel model(env);
 
 		IloNumVarArray var(env);
@@ -111,14 +113,14 @@ int main (int argc, char **argv){
 			cplex.getValues(vals, var);
 			env.out() << "Solution status = " << cplex.getStatus() << endl;
 			env.out() << "Values        = " << vals << endl;
-		}
+		}*/
 		
 	}
-
+	/*
 	catch (IloException &e) {
 		env.error() << "Failed to optimize LP" << endl;
  		cerr << "Concert exception caught: " << e <<'\n';
-	} 
+	} */
 	
 	catch (std::exception &e){
 		cerr <<e.what()<<'\n';
@@ -130,6 +132,6 @@ int main (int argc, char **argv){
 	catch (...) {
       cerr << "Unknown exception caught" <<'\n';
 	}
-	env.end(); 
+	//env.end(); 
 
 }

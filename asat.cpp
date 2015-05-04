@@ -2,6 +2,38 @@
 
 using namespace boost::random;
 
+F::F(sat_prob &A, const std::vector<int> &configuration){
+
+	N = 0;
+	vec.resize(A.get_num_clauses());
+	for(size_t i = 0; i<A.get_num_clauses();++i){
+		size_t sum = 0;
+		for(size_t j = 0; j<A.get_clause(i).v.size();++j){		
+			if((A.get_clause(i).v[j] < 0 && configuration[-A.get_clause(i).v[j]-1]) || (A.get_clause(i).v[j] > 0 && configuration[A.get_clause(i).v[j]-1]))
+				sum++;
+		}
+		vec[i] = sum;
+		if(sum == 0){
+			N++;
+			U.push_back(i);
+		}	
+	}
+}
+
+//fills respectivly the vectors with indices of clauses where x_i or its conjugate is present
+void find_clauses_for_var(const sat_prob &A, std::vector<std::vector<int> > &R1, std::vector<std::vector<int> > &R2){
+
+	for(std::size_t j = 0;j<A.get_num_clauses();++j){
+		for(std::size_t k = 0; k<A.get_clause(j).v.size();++k){
+			if(A.get_clause(j).v[k]<0)
+				R2[-A.get_clause(j).v[k]-1].push_back(j);
+			else
+				R2[A.get_clause(j).v[k]-1].push_back(j);
+		}
+	}
+}
+
+
 
 
 std::vector<int> solve_by_asat (sat_prob &A, unsigned int s, double p){
@@ -10,20 +42,17 @@ std::vector<int> solve_by_asat (sat_prob &A, unsigned int s, double p){
 	mt19937 g(seed);
 	
 	std::vector<int> configuration (A.get_num_variables());
+	std::vector<std::vector<int> > R1, R2;
 	
 	for(size_t i = 0; i<A.get_num_variables();++i)
 		configuration[i] = uniform_int_distribution<>(0, 1)(g);
+
+	F t(A,configuration);
+	find_clauses_for_var(A,R1,R2);
+	std::cout<<t.N<<'\n';
 	
-	for(size_t i = 0; i<A.get_num_clauses();++i)
-		for(size_t j = 0; j<A.get_clause(i).v.size();++j){
-			
-		
-		
-		
-		}
-	
-	
-	return configuration;
+	return t.U;
+	//return configuration;
 }
 
 
