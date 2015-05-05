@@ -14,11 +14,16 @@
 struct F{
 	// Number of unsatisfied clauses
 	size_t N;
+	size_t N_temp;
 	// stores the number of literals which satisfy the clause
 	std::vector<int> vec;
+	// stores indices of unsatisfied clauses
 	std::vector<int> U;
+	std::vector<int> POS;
 	
 	F(sat_prob &A, const std::vector<int> &configuration);
+	
+	void rm_satisf (sat_prob &A, int x);
 };
 
 

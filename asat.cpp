@@ -6,6 +6,9 @@ F::F(sat_prob &A, const std::vector<int> &configuration){
 
 	N = 0;
 	vec.resize(A.get_num_clauses());
+	U.reserve(A.get_num_variables());
+	POS.resize(A.get_num_variables(), -1);
+	
 	for(size_t i = 0; i<A.get_num_clauses();++i){
 		size_t sum = 0;
 		for(size_t j = 0; j<A.get_clause(i).v.size();++j){		
@@ -13,12 +16,18 @@ F::F(sat_prob &A, const std::vector<int> &configuration){
 				sum++;
 		}
 		vec[i] = sum;
-		if(sum == 0){
-			N++;
+		if(sum == 0){			
 			U.push_back(i);
+			POS[i] = N;
+			N++;
 		}	
 	}
 }
+
+
+
+
+
 
 //fills respectivly the vectors with indices of clauses where x_i or its conjugate is present
 void find_clauses_for_var(const sat_prob &A, std::vector<std::vector<int> > &R1, std::vector<std::vector<int> > &R2){
@@ -33,10 +42,9 @@ void find_clauses_for_var(const sat_prob &A, std::vector<std::vector<int> > &R1,
 	}
 }
 
-
-
-
 std::vector<int> solve_by_asat (sat_prob &A, unsigned int s, double p){
+	
+	unsigned int max_tries = 100000;
 
 	mt19937::result_type seed = s;
 	mt19937 g(seed);
@@ -47,12 +55,29 @@ std::vector<int> solve_by_asat (sat_prob &A, unsigned int s, double p){
 	for(size_t i = 0; i<A.get_num_variables();++i)
 		configuration[i] = uniform_int_distribution<>(0, 1)(g);
 
-	F t(A,configuration);
 	find_clauses_for_var(A,R1,R2);
-	std::cout<<t.N<<'\n';
+	F t(A,configuration);
 	
-	return t.U;
-	//return configuration;
+	for(size_t i = 0; i<max_tries;++i){
+	
+		if(t.U.size()==0)
+			return configuration;
+	
+		size_t w = uniform_int_distribution<>(0,t.U.size()-1)(g);
+		size_t z = uniform_int_distribution<>(0,A.get_clause(w).v.size()-1)(g);
+	
+		unsigned int x = abs(A.get_clause(w).v[z])-1;
+		
+		if(configuration[x] == 0)	
+			configuration[x] = 1;
+		else
+			configuration[x] = 0;
+
+	}
+	
+	
+
+	return configuration;
 }
 
 
