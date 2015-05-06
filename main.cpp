@@ -79,7 +79,7 @@ int main (int argc, char **argv){
 	
 		randomize_prob(A,seed,num_literals,exact);
 		
-		//A.print_problem();
+		A.print_problem();
 
 		std::vector<int> t = solve_by_asat(A,seed,0.21);
 		for(size_t i = 0; i<t.size();++i)
