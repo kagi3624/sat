@@ -20,7 +20,8 @@ public:
 	std::vector<int> K;  										// stores the multiplicity of satisfaction for each clause
 	std::vector<int> U;											// stores the indices of current unsatisfied clauses
 	std::vector<int> POS;										// stores the position of the unsatisfied clauses in U
-	std::vector<int> B1, B2;								// respectively stores the indices of clauses which have been removed/added in U
+	std::vector<int> B1;										// stores the indices of clauses which have been removed from U
+	std::vector<int> B2;										// stores the indices of clauses which have been added to U
 	std::vector<std::vector<int> > R1, R2;	// respectively sotres the indices of clauses in which x_i/̄x_i is present 
 	
 	template <typename URNG> 
@@ -34,22 +35,29 @@ public:
 		K.resize(A.get_num_clauses());
 		U.reserve(A.get_num_clauses());
 		POS.resize(A.get_num_clauses(), -1);
+		R1.resize(A.get_num_variables());
+		R2.resize(A.get_num_variables());
 		B1.reserve(2*A.get_num_clauses()/3);
 		B2.reserve(2*A.get_num_clauses()/3);
 	
-		for(size_t i = 0; i<A.get_num_clauses();++i){
-			size_t sum = 0;
-			for(size_t j = 0; j<A.get_clause(i).v.size();++j){		
-				if((A.get_clause(i).v[j] < 0 && configuration[-A.get_clause(i).v[j]-1] == 0) || (A.get_clause(i).v[j] > 0 && configuration[A.get_clause(i).v[j]-1] ==1))
-					sum++;
+		try{
+			for(size_t i = 0; i<A.get_num_clauses();++i){
+				size_t sum = 0;
+				for(size_t j = 0; j<A.get_clause(i).v.size();++j){		
+					if((A.get_clause(i).v[j] < 0 && configuration[-A.get_clause(i).v[j]-1] == 0) || (A.get_clause(i).v[j] > 0 && configuration[A.get_clause(i).v[j]-1] ==1))
+						sum++;
+				}
+				K[i] = sum;
+				if(sum == 0){			
+					U.push_back(i);
+					POS[i] = E;
+					E++;
+				}	
 			}
-			K[i] = sum;
-			if(sum == 0){			
-				U.push_back(i);
-				POS[i] = E;
-				E++;
-			}	
 		}
+		catch(char const* s) {std::cerr<<s<<'\n';}
+		catch (...) {std::cerr << "Unknown exception caught" <<'\n';}
+
 	}	
 	
 	template <typename URNG> 
@@ -57,31 +65,36 @@ public:
 	
 		E_flip = E;
 		
+		B1.clear();
+		B2.clear();
+		
 		size_t w = boost::random::uniform_int_distribution<>(0,U.size()-1)(g);
 		size_t z = boost::random::uniform_int_distribution<>(0,A.get_clause(w).v.size()-1)(g);
 		
 		x = abs(A.get_clause(w).v[z])-1;
+		std::cout<<"x flip to "<<configuration[x]<<'\n';	
 		
 		if(configuration[x] == 0){	
 			configuration[x] = 1;
 			
-			run_through_increasing(R1[x]);		
-			run_through_decreasing(R2[x]);
+			run_increasing_satisfiability(R1[x]);		
+			run_decreasing_satisfiability(R2[x]);
 		
 		}
 		else{
 			configuration[x] = 0;
 			
-			run_through_increasing(R2[x]);
-			run_through_decreasing(R1[x]);
+			run_increasing_satisfiability(R2[x]);
+			run_decreasing_satisfiability(R1[x]);
 			
 		}
 	}
 	
 	void remove(size_t i);
 	void add(size_t i);
-	void run_through_increasing(const std::vector<int> &R);
-	void run_through_decreasing(const std::vector<int> &R);
+	void run_increasing_satisfiability(const std::vector<int> &R);
+	void run_decreasing_satisfiability(const std::vector<int> &R);
+	void flip_back();
 	
 };
 
