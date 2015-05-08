@@ -5,8 +5,7 @@ using namespace boost::random;
 
 
 void asat::remove(size_t i){
-	try{
-		std::cout<<"removed: "<<i<<"--->"<<POS[i]<<'\n';
+
 		if((unsigned int)POS[i] == U.size()-1){
 			POS[i] = -1;
 			U.pop_back();
@@ -18,10 +17,6 @@ void asat::remove(size_t i){
 			POS[i] = -1;
 			U.pop_back();
 		}
-		if(POS[i] != - 1) throw "something went wrong, clause not removed!";
-	}
-	catch(char const* s) {std::cerr<<s<<'\n';}
-	catch (...) {std::cerr << "Unknown exception caught" <<'\n';}
 }
 
 
@@ -29,7 +24,6 @@ void asat::add(size_t i){
 
 	U.push_back(i);
 	POS[i] = U.size()-1;
-	std::cout<<"added: "<<i<<"--->"<<U.size()-1<<'\n';
 }
 
 
@@ -63,31 +57,33 @@ void asat::flip_back(){
 	
 		configuration[x] = 1;
 	
-		std::cout<<"x flip back to "<<x<<'\n';
 		
 		for(size_t i = 0; i<R1[x].size(); ++i)
 			K[R1[x][i]]++;
 		for(size_t i = 0; i<R2[x].size(); ++i)
-			K[R1[x][i]]--;
+			K[R2[x][i]]--;
 	}
 	else{ 
 	
 		configuration[x] = 0;
+
 		
 		for(size_t i = 0; i<R1[x].size(); ++i)
 			K[R1[x][i]]--;
 		for(size_t i = 0; i<R2[x].size(); ++i)
-			K[R1[x][i]]++;
+			K[R2[x][i]]++;
 		
 	}
-	
-	for(size_t i = 0; i<B2.size();++i)	
-		remove(B2[i]);
-	for(size_t i = 0; i<B1.size();++i)
-		add(B1[i]);
-		
-		B1.clear();
-		B2.clear();
+	try{
+		for(size_t i = 0; i<B2.size();++i)	
+			remove(B2[i]);
+		for(size_t i = 0; i<B1.size();++i)
+			add(B1[i]);
+		if(U.size()!=E) throw "Error at the flip back stage!";
+	}
+	catch(char const* s) {std::cerr<<s<<'\n';}
+			B1.clear();
+			B2.clear();
 	
 }
 
@@ -109,9 +105,9 @@ void find_clauses_for_var(const sat_prob &A, std::vector<std::vector<int> > &R1,
 
 
 
-std::vector<int> solve_by_asat (sat_prob &A, unsigned int s, double p){
+std::vector<int> solve_by_asat (sat_prob A, const unsigned int s, const double p, const bool b){
 
-	size_t max_tries = 1;
+	unsigned long long int  max_flips = 1000000000000LL;
 
 	mt19937::result_type seed = s;
 	mt19937 g(seed);
@@ -121,80 +117,48 @@ std::vector<int> solve_by_asat (sat_prob &A, unsigned int s, double p){
 	find_clauses_for_var(A,D.R1,D.R2);
 	
 	
-	for(size_t i = 0; i<max_tries; ++i){
-		
-		if(D.E == 0)
-			return D.configuration;
-			
-
-		
-		std::cout<<"U before: ";
-		for(size_t i = 0; i<D.U.size();++i)
-			std::cout<<D.U[i]<<" ";
-		std::cout<<'\n';
-
-		std::cout<<"POS before: ";
-		for(size_t i = 0; i<D.POS.size();++i)
-			std::cout<<D.POS[i]<<" ";
-		std::cout<<'\n';
-		
-		std::cout<<"satisfiability before: ";
-		for(size_t i = 0; i<D.K.size();++i)
-			std::cout<<D.K[i]<<" ";
-		std::cout<<'\n';
-		
-		D.flip(A,g);
-		
-		std::cout<<"satisfiability after: ";
-		for(size_t i = 0; i<D.K.size();++i)
-			std::cout<<D.K[i]<<" ";
-		std::cout<<'\n';
-		
-		std::cout<<"B1: ";
-		for(size_t i = 0; i<D.B1.size();++i)
-			std::cout<<D.B1[i]<<" ";
-		std::cout<<'\n';
-		
-		std::cout<<"B2: ";
-		for(size_t i = 0; i<D.B2.size();++i)
-			std::cout<<D.B2[i]<<" ";	
-		std::cout<<"\n----------------------------------------------------------------------\n";
-		
-		//if(D.E_flip>D.E && uniform_real_distribution<>(0.0,1.0)(g)>p){
-			
-		std::cout<<"**************************************************************************\n";
-		std::cout<<"not accepted\n";
-		D.flip_back();
-		
-		std::cout<<"satisfiability after flipback: ";
-		for(size_t i = 0; i<D.K.size();++i)
-			std::cout<<D.K[i]<<" ";
-		std::cout<<'\n';
-			
-		std::cout<<"U after flip_back: ";
-		for(size_t i = 0; i<D.U.size();++i)
-			std::cout<<D.U[i]<<" ";
-		std::cout<<'\n';
-
-		std::cout<<"POS U after flip_back: ";
-		for(size_t i = 0; i<D.POS.size();++i)
-			std::cout<<D.POS[i]<<" ";
-		std::cout<<'\n';
-		
-		std::cout<<"B1 after flip_back: ";
-		for(size_t i = 0; i<D.B1.size();++i)
-			std::cout<<D.B1[i]<<" ";
-		std::cout<<'\n';
-		
-		std::cout<<"B2 after flip_back: ";
-		for(size_t i = 0; i<D.B2.size();++i)
-			std::cout<<D.B2[i]<<" ";	
-		std::cout<<"\n**************************************************************************\n";
-		//}
 	
-		//else
-			D.E = D.E_flip;
+	if(b == true){
+	
+		std::ofstream file;
+  	file.open ("asat.dat");
+		
+		for(unsigned long long int i = 0; i<max_flips; ++i){
+		
+			if(D.E == 0){
+				std::cout<<"\nconfiguration:";
+				for(size_t i = 0; i<D.configuration.size();++i)
+					std::cout<<D.configuration[i]<<" ";
+				return D.configuration;
+			}
+				
+			D.flip(A,g);
+		
+			if(D.E_flip>D.E && uniform_real_distribution<>(0.0,1.0)(g)>p)
+				D.flip_back();
+			else
+				D.E = D.E_flip;	
+				
+			file<<(double)i/A.get_num_clauses()<<" "<<D.E<<'\n';
+		}
+	file<<'\n'<<max_flips<<"reached\n";
+	file.close();
 	}
+	else{	
+		for(unsigned long long int i = 0; i<max_flips; ++i){
+		
+			if(D.E == 0)
+				return D.configuration;
+				
+			D.flip(A,g);
+		
+			if(D.E_flip>D.E && uniform_real_distribution<>(0.0,1.0)(g)>p)
+				D.flip_back();
+			else
+				D.E = D.E_flip;
+			std::cout<<i<<" "<<D.E<<'\n';
+		}
+	}	
 	
 	return D.configuration;
 	

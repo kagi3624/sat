@@ -1,6 +1,7 @@
 #ifndef asat_HPP
 #define asat_HPP
 
+#include <fstream>
 #include <cmath>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -42,13 +43,11 @@ public:
 	
 		try{
 			for(size_t i = 0; i<A.get_num_clauses();++i){
-				size_t sum = 0;
-				for(size_t j = 0; j<A.get_clause(i).v.size();++j){		
+				for(size_t j = 0; j<A.get_clause(i).v.size();++j)	
 					if((A.get_clause(i).v[j] < 0 && configuration[-A.get_clause(i).v[j]-1] == 0) || (A.get_clause(i).v[j] > 0 && configuration[A.get_clause(i).v[j]-1] ==1))
-						sum++;
-				}
-				K[i] = sum;
-				if(sum == 0){			
+						K[i]++;
+	
+				if(K[i] == 0){			
 					U.push_back(i);
 					POS[i] = E;
 					E++;
@@ -72,7 +71,7 @@ public:
 		size_t z = boost::random::uniform_int_distribution<>(0,A.get_clause(w).v.size()-1)(g);
 		
 		x = abs(A.get_clause(w).v[z])-1;
-		std::cout<<"x flip to "<<configuration[x]<<'\n';	
+			
 		
 		if(configuration[x] == 0){	
 			configuration[x] = 1;
@@ -100,6 +99,6 @@ public:
 
 
 
-std::vector<int> solve_by_asat (sat_prob &A, unsigned int s = 1717, double p=0.3);
+std::vector<int> solve_by_asat (sat_prob A, const unsigned int s = 1717, const double p=0.21, const bool b = false);
 
 #endif 

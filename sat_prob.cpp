@@ -6,13 +6,13 @@ void clause::print_clause(){
 	
 	for(std::size_t i=0; i<v.size();++i){
 			if(v[i]<0 && i == v.size()-1)
-				std::cout<<"\u0304x"<<-v[i]<<'\n';
+				std::cout<<"\u0304x"<<-v[i]-1<<'\n';
 			else if (v[i]>0 && i == v.size()-1)
-				std::cout<<'x'<<v[i]<<'\n';
+				std::cout<<'x'<<v[i]-1<<'\n';
 			else if (v[i]<0)
-				std::cout<<"\u0304x"<<-v[i]<<" \u2228 ";
+				std::cout<<"\u0304x"<<-v[i]-1<<" \u2228 ";
 			else 
-				std::cout<<'x'<<v[i]<<" \u2228 ";
+				std::cout<<'x'<<v[i]-1<<" \u2228 ";
 	}
 };
 
@@ -48,7 +48,7 @@ void sat_prob::add_clause(clause const& f){
 
 void sat_prob::print_problem(){
 	for (unsigned int i = 0; i<problem.size();++i){
-		std::cout<<"c"<<i+1<<": ";
+		std::cout<<"c"<<i<<": ";
 		problem[i].print_clause();
 		
 	}
