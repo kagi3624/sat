@@ -116,7 +116,6 @@ std::vector<int> solve_by_asat (sat_prob A, const unsigned int s, const double p
 	asat D(A,g);
 	find_clauses_for_var(A,D.R1,D.R2);
 	
-	std::cout<<D.E<<'\n';
 	
 	if(b == true){
 	
