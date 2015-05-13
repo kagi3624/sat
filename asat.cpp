@@ -6,7 +6,7 @@ using namespace boost::random;
 
 void asat::remove(size_t i){
 
-		if((unsigned int)POS[i] == U.size()-1){
+		if(POS[i] == U.size()-1){
 			POS[i] = -1;
 			U.pop_back();
 		}
@@ -116,7 +116,7 @@ std::vector<int> solve_by_asat (sat_prob A, const unsigned int s, const double p
 	asat D(A,g);
 	find_clauses_for_var(A,D.R1,D.R2);
 	
-	
+	std::cout<<D.E<<'\n';
 	
 	if(b == true){
 	
@@ -147,16 +147,23 @@ std::vector<int> solve_by_asat (sat_prob A, const unsigned int s, const double p
 	else{	
 		for(unsigned long long int i = 0; i<max_flips; ++i){
 		
-			if(D.E == 0)
-				return D.configuration;
+			if(D.E == 0){
+			for(size_t i = 0; i<D.configuration.size();++i)
+					std::cout<<D.configuration[i]<<" ";
+			std::cout<<'\n';
+			return D.configuration;
+			}
 				
 			D.flip(A,g);
 		
-			if(D.E_flip>D.E && uniform_real_distribution<>(0.0,1.0)(g)>p)
+			if(D.E_flip>D.E && uniform_real_distribution<>(0.0,1.0)(g)>p){
+				std::cout<<i<<" "<<"NOT"<<" "<<D.E_flip<<'\n';
 				D.flip_back();
-			else
+			}
+			else{
+				std::cout<<i<<" "<<"YES"<<" "<<D.E_flip<<'\n';
 				D.E = D.E_flip;
-			std::cout<<i<<" "<<D.E<<'\n';
+			}
 		}
 	}	
 	

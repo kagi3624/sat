@@ -64,10 +64,10 @@ void random_sample(Distribution& pool, std::size_t k, OutIt out, URNG &g, const 
 }*/
 
 
-void randomize_prob(sat_prob &A, unsigned int s, unsigned int num_lit, int exact){
+void randomize_prob(sat_prob &A, unsigned int s, unsigned int num_lit, bool exact){
 
 	try{
-		if(A.get_num_variables() == 0 || A.get_num_clauses() == 0) throw "Error: SAT problem should't be empty!";
+		if(A.get_num_variables() == 0 || A.get_num_clauses() == 0) throw "By definition an empty SAT problem (no clauses) is satisfied!";
 		
 		unsigned int num_var = A.get_num_variables();
 		unsigned int num_cl  = A.get_num_clauses();
@@ -106,7 +106,7 @@ void randomize_prob(sat_prob &A, unsigned int s, unsigned int num_lit, int exact
 				}
 			}
 		}
-		else if(exact == 0){
+		else if(exact == false){
 			uniform_int_distribution<int> random_num_literals(1,num_lit);
 			for(unsigned int n = 0; n<num_cl;++n){
 				unsigned int k = random_num_literals(gen);
