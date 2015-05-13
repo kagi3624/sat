@@ -19,6 +19,6 @@
 
 
 
-void randomize_prob(sat_prob &A, unsigned int s = 1717, unsigned int num_lit=0, int exact = 0);
+void randomize_prob(sat_prob &A, unsigned int s = 1717, unsigned int num_lit=0, bool exact = true);
 
 #endif
