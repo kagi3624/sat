@@ -7,6 +7,6 @@
 
 #include "asat.hpp"
 
-void solve_by_cplex(const sat_prob A);
+void solve_by_cplex(const sat_prob &A);
 
 #endif

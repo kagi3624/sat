@@ -4,10 +4,12 @@ ILOSTLBEGIN
 
 
 static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A){
-   IloEnv env = model.getEnv();
+	IloEnv env = model.getEnv();
+   
+	IloObjective obj = 0;   
 
 	for(long long unsigned int i = 0; i<A.get_num_variables();++i){
-		x.add(IloNumVar(env, 0, 1, ILOINT));
+		x.add(IloNumVar(env, 0, 1, ILOFLOAT));
 		string S = "x" + to_string(i+1);
 		x[i].setName(S.c_str());
 	}
@@ -32,7 +34,7 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
    model.add(c);
 }
 
-void solve_by_cplex(const sat_prob A){
+void solve_by_cplex(const sat_prob &A){
 
 	IloEnv   env;
 
@@ -46,6 +48,9 @@ void solve_by_cplex(const sat_prob A){
 		populatebynonzero (model, var, con, A);
 		
 		IloCplex cplex(model);
+		
+		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
+		
 		int i = cplex.solve(); 
 		cplex.exportModel("lpex1.lp");
 		
@@ -57,6 +62,14 @@ void solve_by_cplex(const sat_prob A){
 		else{
 			IloNumArray vals(env);
 			cplex.getValues(vals, var);
+			
+			
+			/*int s = vals.getSize();
+			std::vector<double> sol_out(s);
+			for(int i=0; i<s; ++i)
+  			sol_out[i] = vals[i];*/
+  			
+  			
 			env.out() << "Solution status = " << cplex.getStatus() << endl;
 			env.out() << "Values        = " << vals << endl;
 		}

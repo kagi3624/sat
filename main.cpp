@@ -43,7 +43,7 @@ int main (int argc, char **argv){
 		
 		if(num_literals>num_variables) throw "Error: Number of variables can't be lower than the number of literals!";
 		
-		if(vm.count("rsf3") && num_literals !=3) throw "rsf3 is for 3SAT only!";
+		if(num_literals !=3 && rsf3==true) throw "rsf3 is for 3SAT only!";
 		
 		if(!vm.count("cplex")&&!vm.count("asat")&&!vm.count("oldsat")) throw "select at least one solver!";
 		
@@ -53,6 +53,8 @@ int main (int argc, char **argv){
 			randomize_k3(A,num_literals,seed);
 		else
 			randomize_prob(A,seed,num_literals,exact);
+		A.print_problem();
+		
 		if(cpl == true) solve_by_cplex(A);
 		if(oldasat == true) std::vector<int> t = old_asat(A,seed,0.21);
 		if(asat == true) std::vector<int> t = solve_by_asat(A,seed,0.21);
