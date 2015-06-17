@@ -53,7 +53,7 @@ int main (int argc, char **argv){
 			randomize_k3(A,num_literals,seed);
 		else
 			randomize_prob(A,seed,num_literals,exact);
-		A.print_problem();
+		//A.print_problem();
 		
 		if(cpl == true) solve_by_cplex(A);
 		if(oldasat == true) std::vector<int> t = old_asat(A,seed,0.21);

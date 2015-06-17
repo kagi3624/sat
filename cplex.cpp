@@ -49,7 +49,10 @@ void solve_by_cplex(const sat_prob &A){
 		
 		IloCplex cplex(model);
 		
+		//cplex.setOut(env.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
+		//cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int i = cplex.solve(); 
 		cplex.exportModel("lpex1.lp");
@@ -62,13 +65,6 @@ void solve_by_cplex(const sat_prob &A){
 		else{
 			IloNumArray vals(env);
 			cplex.getValues(vals, var);
-			
-			
-			/*int s = vals.getSize();
-			std::vector<double> sol_out(s);
-			for(int i=0; i<s; ++i)
-  			sol_out[i] = vals[i];*/
-  			
   			
 			env.out() << "Solution status = " << cplex.getStatus() << endl;
 			env.out() << "Values        = " << vals << endl;
