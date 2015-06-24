@@ -6,7 +6,7 @@ ILOSTLBEGIN
 static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A){
 	IloEnv env = model.getEnv();
    
-	IloObjective obj = 0;   
+	IloObjective obj = IloMaximize(env);  
 
 	for(long long unsigned int i = 0; i<A.get_num_variables();++i){
 		x.add(IloNumVar(env, 0, 1, ILOFLOAT));
@@ -30,8 +30,8 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 		
 		}
 	}
-	
-   model.add(c);
+	model.add(obj);
+  model.add(c);
 }
 
 void solve_by_cplex(const sat_prob &A){

@@ -29,7 +29,7 @@ void test_for_int(const int v,const int c,const int k,const int r,const int s, c
 static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A){
 	IloEnv env = model.getEnv();
    
-	IloObjective obj = IloMaximize(env);;   
+	IloObjective obj = IloMaximize(env);   
 
 	for(size_t i = 0; i<A.get_num_variables();++i){
 		x.add(IloNumVar(env, 0, 1, ILOFLOAT));
