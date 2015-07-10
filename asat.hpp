@@ -20,7 +20,7 @@ public:
 	std::vector<int> configuration;
 	std::vector<int> K;  										// stores the multiplicity of satisfaction for each clause
 	std::vector<int> U;											// stores the indices of current unsatisfied clauses
-	std::vector<unsigned int> POS;										// stores the position of the unsatisfied clauses in U
+	std::vector<unsigned int> POS;					// stores the position of the unsatisfied clauses in U
 	std::vector<int> B1;										// stores the indices of clauses which have been removed from U
 	std::vector<int> B2;										// stores the indices of clauses which have been added to U
 	std::vector<std::vector<int> > R1, R2;	// respectively sotres the indices of clauses in which x_i/̄x_i is present 

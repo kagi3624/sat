@@ -3,8 +3,9 @@
 #include "asat.hpp"
 #include "old_asat.hpp"
 #include "rsf3.hpp"
+#include "gcon.hpp"
 
-#include<boost/program_options.hpp>
+#include <boost/program_options.hpp>
 #include <ctime>
 #include <unistd.h>
 
@@ -54,15 +55,18 @@ int main (int argc, char **argv){
 			if(grsf3) throw "grsf3 shouldn't be used with intsol!";
 			test_for_int(num_variables, num_clauses, num_literals, runs, seed, exact);
 		}
-		if(vm.count("cplix")||vm.count("asat")||vm.count("oldasat")){
+		if(vm.count("cplex")||vm.count("asat")||vm.count("oldasat")){
 			sat_prob A(num_variables,num_clauses);
 			grsf3 ? randomize_k3(A,num_literals,seed) : randomize_prob(A,seed,num_literals,exact);
 	
-			if(cpl == true) solve_by_cplex(A);
+			if(cpl == true){
+				solve_by_cplex(A);
+				std::cout<<gcon(A)<<'\n';
+			} 
 			if(oldasat == true) std::vector<int> t = old_asat(A,seed,0.21);
 			if(asat == true) std::vector<int> t = solve_by_asat(A,seed,0.21);
 			
-			//A.print_problem();
+			A.print_problem();
 		}
 		
 		
