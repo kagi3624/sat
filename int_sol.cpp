@@ -18,8 +18,15 @@ void test_for_int(const int v,const int c,const int k,const int r,const int s, c
 		for(auto i = 0; i<r;++i){
 			sat_prob A(v,c);
 			randomize_prob(A, random_seed(gen), k);
+			
+			auto start = std::chrono::high_resolution_clock::now();
 			bool test = integer_solution(A);
-			std::cout<<i<<" "<<test<<'\n';
+			auto end = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double> diff = end-start;
+			
+			auto greatest_connectivity = gcon(A);
+			
+			std::cout<<i<<" "<<test<<" "<<greatest_connectivity<<" "<<diff.count()<<'\n';
 		}
 
 }
