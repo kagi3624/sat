@@ -3,17 +3,18 @@
 ILOSTLBEGIN
 
 
-static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A){
+static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A,  const bool lp = true){
 	IloEnv env = model.getEnv();
    
 	IloObjective obj = IloMaximize(env);  
 
+
 	for(long long unsigned int i = 0; i<A.get_num_variables();++i){
-		x.add(IloNumVar(env, 0, 1, ILOFLOAT));
+		x.add(IloNumVar(env, 0, 1, lp ? ILOFLOAT : ILOINT));
 		string S = "x" + to_string(i+1);
 		x[i].setName(S.c_str());
 	}
-   
+
 	for(long long unsigned int i = 0; i<A.get_num_clauses(); ++i){
 		c.add(IloRange(env, A.range_value(i), IloInfinity));
 		string S = "c" + to_string(i+1);
@@ -36,46 +37,94 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 
 void solve_by_cplex(const sat_prob &A){
 
-	IloEnv   env;
+	IloEnv   lp;
 
 	try{
 	
-		IloModel model(env);
+		IloModel model(lp);
 
-		IloNumVarArray var(env);
-		IloRangeArray con(env);
+		IloNumVarArray var(lp);
+		IloRangeArray con(lp);
 
 		populatebynonzero (model, var, con, A);
 		
 		IloCplex cplex(model);
 		
-		//cplex.setOut(env.getNullStream());
+		cplex.setOut(lp.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
 		//cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int i = cplex.solve(); 
-		cplex.exportModel("lpex1.lp");
+		//cplex.exportModel("lpex1.lp");
 		
 		if (!i){
-			env.out() << "Solution status = " << cplex.getStatus() << endl;
+			lp.out() << "Solution status = " << cplex.getStatus() << endl;
 		}
 
 
 		else{
-			IloNumArray vals(env);
+			IloNumArray vals(lp);
+			IloNumArray slaks(lp);
+			
 			cplex.getValues(vals, var);
-  			
-			env.out() << "Solution status = " << cplex.getStatus() << endl;
-			env.out() << "Values        = " << vals << endl;
+  		cplex.getSlacks(slaks, con);
+  		
+			lp.out() << "Solution status = " << cplex.getStatus() << endl;
+			lp.out() << "Slacks = " << slaks << '\n';
+			lp.out() << "LP values        = " << vals << "\n\n";
 		}
 		
 	}
 	catch (IloException &e) {
-		env.error() << "Failed to optimize LP" << endl;
+		lp.error() << "Failed to optimize LP" << endl;
  		cerr << "Concert exception caught: " << e <<'\n';
 	} 
 	catch (...) {cerr << "Unknown exception caught" <<'\n';}
 	
-	env.end(); 
+	lp.end(); 
+	
+	
+	IloEnv   ilp;
+
+	try{
+	
+		IloModel model(ilp);
+
+		IloNumVarArray var(ilp);
+		IloRangeArray con(ilp);
+
+		populatebynonzero (model, var, con, A, false);
+		
+		IloCplex cplex(model);
+		
+		cplex.setOut(ilp.getNullStream());
+		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
+		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
+		
+		int i = cplex.solve(); 
+		//cplex.exportModel("lpex1.lp");
+		
+		if (!i){
+			lp.out() << "Solution status = " << cplex.getStatus() << endl;
+		}
+
+
+		else{
+			IloNumArray vals(ilp);
+			cplex.getValues(vals, var);
+  			
+			ilp.out() << "Solution status = " << cplex.getStatus() << endl;
+			ilp.out() << "IP values        = " << vals << '\n';
+		}
+		
+	}
+	catch (IloException &e) {
+		ilp.error() << "Failed to optimize LP" << endl;
+ 		cerr << "Concert exception caught: " << e <<'\n';
+	} 
+	catch (...) {cerr << "Unknown exception caught" <<'\n';}
+	
+	ilp.end(); 
 }
