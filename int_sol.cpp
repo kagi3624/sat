@@ -88,7 +88,7 @@ static bool integer_solution(const sat_prob &A){
 		
 		IloCplex cplex(model);
 		
-		cplex.setOut(env.getNullStream());
+		//cplex.setOut(env.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
 		
 		cplex.solve(); 
