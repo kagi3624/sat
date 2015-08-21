@@ -35,12 +35,25 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 	}
 	
 	
-	IloExpr e(env);
 	
-	for(size_t i = 0; i<A.get_num_cuts();++i)
+	for(size_t i = 0; i<A.get_num_cuts();++i){
+	
+		IloExpr e(env);
 		for(size_t j = 0; j<A.get_cut(i).left.size();++j){
-		
+	 		int c = A.get_cut(i).left[j];
+			e += x[c>0 ? c-1 : -c-1];
 		}
+
+		IloConstraint con;
+		
+		if(A.get_cut(i).relation == :: eq)
+			con = (e == A.get_cut(i).right);
+		else if(A.get_cut(i).relation == ::greater)
+			con = (e > A.get_cut(i).right);
+		else if (A.get_cut(i).relation == ::lesser)
+			con = (e < A.get_cut(i).right);
+		model.add(con);
+	}
 
 	model.add(obj);
   model.add(c);
