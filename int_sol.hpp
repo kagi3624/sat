@@ -10,6 +10,7 @@
 #include <math.h> 
 #include <ilcplex/ilocplex.h>
 #include <iostream>
+#include <boost/random/mersenne_twister.hpp>
 #include "randomize_prob.hpp"
 #include "gcon.hpp"
 #include <chrono>

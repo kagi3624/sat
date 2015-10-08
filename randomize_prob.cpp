@@ -32,7 +32,8 @@ void random_flip(std::vector<int> &v, const double p, URNG &g){
 			v[i]=-v[i];
 }
 
-void randomize_prob(sat_prob &A, unsigned int s, unsigned int num_lit, bool exact){
+
+void randomize_prob(sat_prob &A, boost::random::mt19937 &gen, unsigned int num_lit, bool exact){
 
 	try{
 		if(A.get_num_variables() == 0 || A.get_num_clauses() == 0) throw "By definition an empty SAT problem (no clauses) is satisfied!";
@@ -42,9 +43,6 @@ void randomize_prob(sat_prob &A, unsigned int s, unsigned int num_lit, bool exac
 		
 		std::vector<int> T;
 		fill_vec(T, num_var);
-		
-		mt19937::result_type seed = s;
-		mt19937 gen(seed);
 
 
 
@@ -88,48 +86,7 @@ void randomize_prob(sat_prob &A, unsigned int s, unsigned int num_lit, bool exac
 			}
 		}
 		else{
-			size_t c = 0;
-			while(num_lit<=T.size() && c<=num_cl){			
-						clause a(num_lit);		
-						partial_shuffle(T.begin(), T.begin()+num_lit, T.end(), gen);
-						a.v.assign(T.begin(),T.begin()+num_lit); 
-						T.erase(T.begin(),T.begin()+num_lit);
-						random_flip(a.v,A.get_probability(),gen);	
-						A.add_clause(a);
-						c++;
-			}
-			if(num_lit>T.size() && T.size()!=0){
-				if(num_cl == c) throw "Error: Too few clauses for the number of variables and literals!";
-				size_t lim = T.size();
-					for(size_t i = 0; i<num_lit-lim;++i){
-						bool unique = true;
-						uniform_int_distribution<int> random_var(1,num_var);
-						do{
-							bool flag = true;
-							int var = random_var(gen);
-							for(size_t j=0; j<T.size(); ++j){
-								if(var == T[j]){
-									unique = false;
-									flag   = false;
-									break;
-								}
-							}
-							if(flag == true){
-								unique = true;
-								T.push_back(var);
-							}
-						}
-						while(unique == false);
-					}
-				clause a(num_lit);
-				a.v = T;
-				random_flip(a.v,A.get_probability(),gen);
-				A.add_clause(a);
-				c++;
-			}
-			T.clear();
-			fill_vec(T,num_var);
-			for(unsigned int n = c; n<num_cl;++n){
+			for(unsigned int n = 0; n<num_cl;++n){
 				clause a(num_lit);		
 				partial_shuffle(T.begin(), T.begin()+num_lit, T.end(), gen);
 				a.v.assign(T.begin(),T.begin()+num_lit); 

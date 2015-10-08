@@ -6,7 +6,6 @@
 #ifndef randomize_prob_HPP
 #define randomize_prob_HPP
 
-
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -47,7 +46,6 @@ void partial_shuffle(RandomIt first, RandomIt mid, RandomIt last, URNG &g) {
   }
 }
 
-
-void randomize_prob(sat_prob &A, unsigned int s = 1717, unsigned int num_lit=0, bool exact = true);
+void randomize_prob(sat_prob &A, boost::random::mt19937 &gen, unsigned int num_lit=0, bool exact = true);
 
 #endif

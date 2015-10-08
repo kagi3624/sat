@@ -5,6 +5,7 @@
 #include "rsf3.hpp"
 
 #include <boost/program_options.hpp>
+#include <boost/random/mersenne_twister.hpp>
 #include <ctime>
 #include <unistd.h>
 
@@ -23,7 +24,7 @@ int main (int argc, char **argv){
     ("variables,v", po::value<int>(&num_variables), "set number of variables")
     ("literals,k", po::value<int>(&num_literals)->default_value(3), "set number of maximum literals")
     ("clauses,c", po::value<int>(&num_clauses), "set number of clauses")
-    ("seed,s", po::value<int>(&seed)->default_value(time(NULL)+getpid()), "set number of the seed (default is random)")
+    ("seed,s", po::value<int>(&seed)->default_value(1337), "set number of the seed (default is random)")
     ("intsol,i", po::value<int>(&runs), "test for an integer solution within the given number of runs")
     ("exact,e", "set every clause to exact length of given literals")
     ("grsf3,g", "generate a guaranteed satisfiable 3SAT problem")
@@ -56,8 +57,13 @@ int main (int argc, char **argv){
 		}
 		if(vm.count("cplex")||vm.count("asat")||vm.count("oldasat")){
 			sat_prob A(num_variables,num_clauses);
-			vm.count("grsf3") ? randomize_k3(A,num_literals,seed) : randomize_prob(A,seed,num_literals,!vm.count("exact"));
-	
+			
+			if(vm.count("grsf3"))
+				randomize_k3(A,num_literals,seed);
+		 	else{
+		 		boost::random::mt19937 gen(seed);
+		 		randomize_prob(A,gen,num_literals,!vm.count("exact"));
+			}
 			if(vm.count("cplex")){
 				solve_by_cplex(A);
 			} 

@@ -12,6 +12,12 @@
 #include <lemon/list_graph.h>
 
 
-int gcon(const sat_prob &A);
+//where x_i and ̄x_i are same node
+int gcon1(const sat_prob &A);
+
+//where x_i and ̄x_i are distinct node
+int gcon2(const sat_prob &A);
+
+void gcon_test(const sat_prob &A);
 
 #endif
