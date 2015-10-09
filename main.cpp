@@ -70,7 +70,7 @@ int main (int argc, char **argv){
 			if(vm.count("oldasat")) std::vector<int> t = old_asat(A,seed,0.21);
 			if(vm.count("asat")) std::vector<int> t = solve_by_asat(A,seed,0.21);
 			
-			A.print_problem();
+			//A.print_problem();
 		}
 	}
 	

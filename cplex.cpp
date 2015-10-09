@@ -71,7 +71,7 @@ void solve_by_cplex(const sat_prob &A){
   		cplex.getSlacks(slaks, con);
   		
 			lp.out() << "Solution status = " << cplex.getStatus() << endl;
-			lp.out() << "Slacks = " << slaks << '\n';
+			//lp.out() << "Slacks = " << slaks << '\n';
 			lp.out() << "LP values        = " << vals << "\n\n";
 		}
 		
@@ -98,15 +98,15 @@ void solve_by_cplex(const sat_prob &A){
 		
 		IloCplex cplex(model);
 		
-		cplex.setOut(ilp.getNullStream());
+		//cplex.setOut(ilp.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
 		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
-		int i = cplex.solve(); 
+		int j = cplex.solve(); 
 		//cplex.exportModel("lpex1.lp");
 		
-		if (!i){
+		if (!j){
 			lp.out() << "Solution status = " << cplex.getStatus() << endl;
 		}
 
@@ -114,9 +114,25 @@ void solve_by_cplex(const sat_prob &A){
 		else{
 			IloNumArray vals(ilp);
 			cplex.getValues(vals, var);
+		
   			
 			ilp.out() << "Solution status = " << cplex.getStatus() << endl;
 			ilp.out() << "IP values        = " << vals << '\n';
+			
+			/*ilp.out()<<"Cliques: " <<cplex.getNcuts(IloCplex::CutUser)<<'\n';
+			ilp.out()<<"CutCover: " <<cplex.getNcuts(IloCplex::CutCover)<<'\n';
+			ilp.out()<<"CutGubCover: " <<cplex.getNcuts(IloCplex::CutGubCover)<<'\n';
+			ilp.out()<<"CutFlowCover: " <<cplex.getNcuts(IloCplex::CutFlowCover)<<'\n';
+			ilp.out()<<"CutFrac: " <<cplex.getNcuts(IloCplex::CutFrac)<<'\n';
+			ilp.out()<<"CutMCF: " <<cplex.getNcuts(IloCplex::CutMCF)<<'\n';
+			ilp.out()<<"CutMir: " <<cplex.getNcuts(IloCplex::CutMir)<<'\n';
+			ilp.out()<<"CutFlowPath: " <<cplex.getNcuts(IloCplex::CutFlowPath)<<'\n';
+			ilp.out()<<"CutDisj: " <<cplex.getNcuts(IloCplex::CutDisj)<<'\n';
+			ilp.out()<<"CutImplBd: " <<cplex.getNcuts(IloCplex::CutImplBd)<<'\n';
+			ilp.out()<<"CutZeroHalf: " <<cplex.getNcuts(IloCplex::CutDisj)<<'\n';
+			ilp.out()<<"CutLocalCover: " <<cplex.getNcuts(IloCplex::CutLocalCover)<<'\n';
+			ilp.out()<<"CutTighten: " <<cplex.getNcuts(IloCplex::CutTighten)<<'\n';
+			ilp.out()<<"CutObjDisj: " <<cplex.getNcuts(IloCplex::CutObjDisj)<<'\n';*/
 		}
 		
 	}
