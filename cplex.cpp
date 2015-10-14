@@ -52,11 +52,12 @@ void solve_by_cplex(const sat_prob &A){
 		
 		cplex.setOut(lp.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
-		//cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int i = cplex.solve(); 
-		//cplex.exportModel("lpex1.lp");
+		//cplex.exportModel("LP.lp");
 		
 		if (!i){
 			lp.out() << "Solution status = " << cplex.getStatus() << endl;
@@ -85,6 +86,7 @@ void solve_by_cplex(const sat_prob &A){
 	lp.end(); 
 	
 	
+	
 	IloEnv   ilp;
 
 	try{
@@ -101,13 +103,14 @@ void solve_by_cplex(const sat_prob &A){
 		//cplex.setOut(ilp.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
 		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int j = cplex.solve(); 
-		//cplex.exportModel("lpex1.lp");
+		//cplex.exportModel("ILP.lp");
 		
 		if (!j){
-			lp.out() << "Solution status = " << cplex.getStatus() << endl;
+			ilp.out() << "Solution status = " << cplex.getStatus() << endl;
 		}
 
 
@@ -119,7 +122,7 @@ void solve_by_cplex(const sat_prob &A){
 			ilp.out() << "Solution status = " << cplex.getStatus() << endl;
 			ilp.out() << "IP values        = " << vals << '\n';
 			
-			/*ilp.out()<<"Cliques: " <<cplex.getNcuts(IloCplex::CutUser)<<'\n';
+			ilp.out()<<"Cliques: " <<cplex.getNcuts(IloCplex::CutUser)<<'\n';
 			ilp.out()<<"CutCover: " <<cplex.getNcuts(IloCplex::CutCover)<<'\n';
 			ilp.out()<<"CutGubCover: " <<cplex.getNcuts(IloCplex::CutGubCover)<<'\n';
 			ilp.out()<<"CutFlowCover: " <<cplex.getNcuts(IloCplex::CutFlowCover)<<'\n';
@@ -129,10 +132,10 @@ void solve_by_cplex(const sat_prob &A){
 			ilp.out()<<"CutFlowPath: " <<cplex.getNcuts(IloCplex::CutFlowPath)<<'\n';
 			ilp.out()<<"CutDisj: " <<cplex.getNcuts(IloCplex::CutDisj)<<'\n';
 			ilp.out()<<"CutImplBd: " <<cplex.getNcuts(IloCplex::CutImplBd)<<'\n';
-			ilp.out()<<"CutZeroHalf: " <<cplex.getNcuts(IloCplex::CutDisj)<<'\n';
+			ilp.out()<<"CutZeroHalf: " <<cplex.getNcuts(IloCplex::CutZeroHalf)<<'\n';
 			ilp.out()<<"CutLocalCover: " <<cplex.getNcuts(IloCplex::CutLocalCover)<<'\n';
 			ilp.out()<<"CutTighten: " <<cplex.getNcuts(IloCplex::CutTighten)<<'\n';
-			ilp.out()<<"CutObjDisj: " <<cplex.getNcuts(IloCplex::CutObjDisj)<<'\n';*/
+			ilp.out()<<"CutObjDisj: " <<cplex.getNcuts(IloCplex::CutObjDisj)<<'\n';
 		}
 		
 	}
