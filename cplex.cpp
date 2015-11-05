@@ -6,9 +6,16 @@ ILOSTLBEGIN
 static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A,  const bool lp = true){
 	IloEnv env = model.getEnv();
    
-	IloObjective obj = IloMaximize(env);  
+	//IloObjective obj = IloMaximize(env);  
+	
+	/*x.add(IloNumVar(env));
+	x.add(IloNumVar(env));
+	x[0].setName("x1");
+	x[1].setName("x2");*/
+	
+	
 
-
+  
 	for(long long unsigned int i = 0; i<A.get_num_variables();++i){
 		x.add(IloNumVar(env, 0, 1, lp ? ILOFLOAT : ILOINT));
 		string S = "x" + to_string(i+1);
@@ -31,7 +38,15 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 		
 		}
 	}
-	model.add(obj);
+	
+	IloConstraint cons1(x[0] == 0);
+	cons1.setName("c9");
+  IloConstraint cons2(x[1] == 0);
+  cons2.setName("c10");
+	
+	model.add(cons1);
+	model.add(cons2);
+	//model.add(obj);
   model.add(c);
 }
 
@@ -52,12 +67,12 @@ void solve_by_cplex(const sat_prob &A){
 		
 		cplex.setOut(lp.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
-		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		//cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
 		
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int i = cplex.solve(); 
-		//cplex.exportModel("LP.lp");
+		cplex.exportModel("LP.lp");
 		
 		if (!i){
 			lp.out() << "Solution status = " << cplex.getStatus() << endl;
@@ -102,12 +117,14 @@ void solve_by_cplex(const sat_prob &A){
 		
 		//cplex.setOut(ilp.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
-		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
-
+		//cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		
+		//cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, 3);
+		//cplex.setParam(IloCplex::Param::MIP::Cuts::ZeroHalfCut, -1);
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int j = cplex.solve(); 
-		//cplex.exportModel("ILP.lp");
+		cplex.exportModel("ILP.lp");
 		
 		if (!j){
 			ilp.out() << "Solution status = " << cplex.getStatus() << endl;
@@ -122,7 +139,7 @@ void solve_by_cplex(const sat_prob &A){
 			ilp.out() << "Solution status = " << cplex.getStatus() << endl;
 			ilp.out() << "IP values        = " << vals << '\n';
 			
-			ilp.out()<<"Cliques: " <<cplex.getNcuts(IloCplex::CutUser)<<'\n';
+			/*ilp.out()<<"Cliques: " <<cplex.getNcuts(IloCplex::CutClique)<<'\n';
 			ilp.out()<<"CutCover: " <<cplex.getNcuts(IloCplex::CutCover)<<'\n';
 			ilp.out()<<"CutGubCover: " <<cplex.getNcuts(IloCplex::CutGubCover)<<'\n';
 			ilp.out()<<"CutFlowCover: " <<cplex.getNcuts(IloCplex::CutFlowCover)<<'\n';
@@ -135,7 +152,7 @@ void solve_by_cplex(const sat_prob &A){
 			ilp.out()<<"CutZeroHalf: " <<cplex.getNcuts(IloCplex::CutZeroHalf)<<'\n';
 			ilp.out()<<"CutLocalCover: " <<cplex.getNcuts(IloCplex::CutLocalCover)<<'\n';
 			ilp.out()<<"CutTighten: " <<cplex.getNcuts(IloCplex::CutTighten)<<'\n';
-			ilp.out()<<"CutObjDisj: " <<cplex.getNcuts(IloCplex::CutObjDisj)<<'\n';
+			ilp.out()<<"CutObjDisj: " <<cplex.getNcuts(IloCplex::CutObjDisj)<<'\n';*/
 		}
 		
 	}
