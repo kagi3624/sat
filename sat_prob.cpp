@@ -61,7 +61,7 @@ int clause::get_literal (std::size_t i)const{
 	return v[i];
 }
 void clause::set_num_literals(unsigned int const &x){num_literals=x;};
-unsigned int clause::get_num_literals(){
+unsigned int clause::get_num_literals() const{
 	
 	if(num_literals!=v.size()){
 		std::cerr<<"Number of stored literals doesn't match the given number of literals!\n";
@@ -104,7 +104,7 @@ unsigned int sat_prob::get_num_cuts() const {return cut_pool.size();}
 unsigned int sat_prob::get_num_variables() const {return num_variables;}
 double sat_prob::get_probability() const {return probability;}
 
-int sat_prob::range_value(std::size_t i){
+int sat_prob::range_value(std::size_t i) const{
 	int z = 0;
 	for(unsigned int t = 0; t<problem[i].get_num_literals();++t)
 		if(problem[i].get_literal(t)<0)

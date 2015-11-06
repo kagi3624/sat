@@ -3,19 +3,10 @@
 ILOSTLBEGIN
 
 
-static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A,  const bool lp = true){
+static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, const sat_prob &A,  const bool lp = true){
+	
 	IloEnv env = model.getEnv();
-   
-	//IloObjective obj = IloMaximize(env);  
-	
-	/*x.add(IloNumVar(env));
-	x.add(IloNumVar(env));
-	x[0].setName("x1");
-	x[1].setName("x2");*/
-	
-	
-
-  
+     
 	for(long long unsigned int i = 0; i<A.get_num_variables();++i){
 		x.add(IloNumVar(env, 0, 1, lp ? ILOFLOAT : ILOINT));
 		string S = "x" + to_string(i+1);
@@ -39,13 +30,13 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 		}
 	}
 	
-	IloConstraint cons1(x[0] == 0);
+	/*IloConstraint cons1(x[0] == 1);
 	cons1.setName("c9");
-  IloConstraint cons2(x[1] == 0);
+  IloConstraint cons2(x[3] == 1);
   cons2.setName("c10");
 	
 	model.add(cons1);
-	model.add(cons2);
+	model.add(cons2);*/
 	//model.add(obj);
   model.add(c);
 }

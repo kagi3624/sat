@@ -16,7 +16,7 @@ struct clause{
 	void print_clause();
 	void set_num_literals(unsigned int const &x);
 	
-	unsigned int get_num_literals();
+	unsigned int get_num_literals() const;
 	
 	clause(unsigned int x = 0);
 	
@@ -55,7 +55,7 @@ public:
 	unsigned int get_num_cuts() const;
 	double get_probability() const;
 	
-	int range_value(std::size_t i);
+	int range_value(std::size_t i) const;
 	
 	sat_prob(unsigned int x = 0, unsigned int y = 0, double p = 0.5);
 	

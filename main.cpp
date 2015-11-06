@@ -1,6 +1,6 @@
 #include "int_sol.hpp"
 #include "cplex.hpp"
-#include "asat.hpp"
+#include "cliq.hpp"
 #include "old_asat.hpp"
 #include "rsf3.hpp"
 
@@ -29,6 +29,7 @@ int main (int argc, char **argv){
     ("exact,e", "set every clause to exact length of given literals")
     ("grsf3,g", "generate a guaranteed satisfiable 3SAT problem")
     ("cplex,x", "solve by cplex")
+    ("clique,q", "find clique cuts")
     ("asat,a", "solve by asat")
     ("oldasat,o", "solve by old asat");
 
@@ -49,13 +50,13 @@ int main (int argc, char **argv){
 		
 		if(num_literals !=3 && vm.count("grsf3")) throw "grsf3 is for 3SAT only!";
 		
-		if(!vm.count("cplex")&&!vm.count("asat")&&!vm.count("oldasat")&&!vm.count("intsol")) throw "select at least one solver!";
+		if(!vm.count("cplex")&&!vm.count("asat")&&!vm.count("oldasat")&&!vm.count("intsol")&&!vm.count("clique")) throw "select at least one solver!";
 		
 		if(vm.count("intsol")){
 			if(vm.count("grsf3")) throw "grsf3 shouldn't be used with intsol!";
 			test_for_int(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
 		}
-		if(vm.count("cplex")||vm.count("asat")||vm.count("oldasat")){
+		if(vm.count("clique")||vm.count("cplex")||vm.count("asat")||vm.count("oldasat")){
 			sat_prob A(num_variables,num_clauses);
 			
 			if(vm.count("grsf3"))
@@ -64,9 +65,23 @@ int main (int argc, char **argv){
 		 		boost::random::mt19937 gen(seed);
 		 		randomize_prob(A,gen,num_literals,!vm.count("exact"));
 			}
-			if(vm.count("cplex")){
-				solve_by_cplex(A);
-			} 
+			if(vm.count("cplex")) solve_by_cplex(A);
+			if(vm.count("clique")){
+			
+				auto v_11 = find_clique(A,1,1);
+				auto v_10 = find_clique(A,1,0);
+				auto v_01 = find_clique(A,0,1);
+				auto v_00 = find_clique(A,0,0);
+				
+				write(v_11);
+				std::cout<<'\n';
+				write(v_10);
+				std::cout<<'\n';
+				write(v_01);
+				std::cout<<'\n';
+				write(v_00);
+			
+			}
 			if(vm.count("oldasat")) std::vector<int> t = old_asat(A,seed,0.21);
 			if(vm.count("asat")) std::vector<int> t = solve_by_asat(A,seed,0.21);
 			
