@@ -33,7 +33,7 @@ int main (int argc, char **argv){
     ("asat,a", "solve by asat")
     ("oldasat,o", "solve by old asat");
 
-		
+
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		po::notify(vm); 
@@ -68,18 +68,7 @@ int main (int argc, char **argv){
 			if(vm.count("cplex")) solve_by_cplex(A);
 			if(vm.count("clique")){
 			
-				auto v_11 = find_clique(A,1,1);
-				auto v_10 = find_clique(A,1,0);
-				auto v_01 = find_clique(A,0,1);
-				auto v_00 = find_clique(A,0,0);
-				
-				write(v_11);
-				std::cout<<'\n';
-				write(v_10);
-				std::cout<<'\n';
-				write(v_01);
-				std::cout<<'\n';
-				write(v_00);
+				// TO FILL
 			
 			}
 			if(vm.count("oldasat")) std::vector<int> t = old_asat(A,seed,0.21);
