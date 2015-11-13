@@ -30,13 +30,6 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 		}
 	}
 	
-	/*IloConstraint cons1(x[0] == 1);
-	cons1.setName("c9");
-  IloConstraint cons2(x[3] == 1);
-  cons2.setName("c10");
-	
-	model.add(cons1);
-	model.add(cons2);*/
 	//model.add(obj);
   model.add(c);
 }
@@ -58,7 +51,7 @@ void solve_by_cplex(const sat_prob &A){
 		
 		cplex.setOut(lp.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
-		//cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
 		
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
