@@ -44,15 +44,11 @@ std::vector<std::tuple<int,int,int,int> > find_clique(const sat_prob &A){
       for(unsigned int j = i+1; j<A.get_num_variables();++j){
       	
       	//for 00
-      	IloConstraint cons1(var[i] == 0);
-      	IloConstraint cons2(var[j] == 0);
-
-      	cons1.setName("cons1");
-      	cons2.setName("cons2");
       	
-      	model.add(cons1);
-				model.add(cons2);
-				
+       	var[i].setBounds(0,0);
+       	var[j].setBounds(0,0);
+
+
 				IloCplex cplex(model);
 				cplex.setOut(lp.getNullStream());
 				cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
@@ -68,19 +64,10 @@ std::vector<std::tuple<int,int,int,int> > find_clique(const sat_prob &A){
 				}
 				
 
-				
-				model.remove(cons1);
-				model.remove(cons2);
-				
-				//for 01
-      	IloConstraint cons3(var[i] == 0);
-      	IloConstraint cons4(var[j] == 1);
 
-      	cons3.setName("cons3");
-      	cons4.setName("cons4");
-      	
-      	model.add(cons3);
-				model.add(cons4);
+				//for 01
+       	var[i].setBounds(0,0);
+       	var[j].setBounds(1,1);
 				
 				
 				solution = cplex.solve(); 
@@ -92,22 +79,10 @@ std::vector<std::tuple<int,int,int,int> > find_clique(const sat_prob &A){
 					//cplex.exportModel(S3.c_str());
 				}
 				
-
-				
-				model.remove(cons3);
-				model.remove(cons4);
-				
 				//for 10
-      	IloConstraint cons5(var[i] == 1);
-      	IloConstraint cons6(var[j] == 0);
-
-      	cons5.setName("cons5");
-      	cons6.setName("cons6");
-      	
-      	model.add(cons5);
-				model.add(cons6);
-				
-				
+				var[i].setBounds(1,1);
+       	var[j].setBounds(0,0);
+							
 				solution = cplex.solve(); 
 				
 				if(!solution){
@@ -117,21 +92,9 @@ std::vector<std::tuple<int,int,int,int> > find_clique(const sat_prob &A){
 					//cplex.exportModel(S3.c_str());
 				}
 				
-
-				
-				model.remove(cons5);
-				model.remove(cons6);
-				
 				//for 11
-      	IloConstraint cons7(var[i] == 1);
-      	IloConstraint cons8(var[j] == 1);
-
-      	cons7.setName("cons7");
-      	cons8.setName("cons8");
-      	
-      	model.add(cons7);
-				model.add(cons8);
-				
+       	var[i].setBounds(1,1);
+       	var[j].setBounds(1,1);
 				
 				solution = cplex.solve(); 
 				
@@ -144,10 +107,8 @@ std::vector<std::tuple<int,int,int,int> > find_clique(const sat_prob &A){
 				
 
 				
-				model.remove(cons7);
-				model.remove(cons8);
-				
-				//std::cout<<i<<" "<<j<<'\n';
+       	var[i].setBounds(0,1);
+       	var[j].setBounds(0,1);
 			}
 			
 			
