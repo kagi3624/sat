@@ -63,8 +63,7 @@ std::vector<std::tuple<int,int,int,int> > find_clique(const sat_prob &A){
 					//cplex.exportModel(S3.c_str());
 				}
 				
-
-
+				
 				//for 01
        	var[i].setBounds(0,0);
        	var[j].setBounds(1,1);
@@ -90,7 +89,8 @@ std::vector<std::tuple<int,int,int,int> > find_clique(const sat_prob &A){
 					results.push_back(std::make_tuple(1,0,i,j));
 					//string S3 = "lps/10_lp"+to_string(i)+to_string(j)+".lp";
 					//cplex.exportModel(S3.c_str());
-				}
+				} 
+				
 				
 				//for 11
        	var[i].setBounds(1,1);

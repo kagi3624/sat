@@ -156,11 +156,11 @@ std::vector<int> solve_by_asat (sat_prob A, const unsigned int s, const double p
 			D.flip(A,g);
 		
 			if(D.E_flip>D.E && uniform_real_distribution<>(0.0,1.0)(g)>p){
-				std::cout<<i<<" "<<"NOT"<<" "<<D.E_flip<<'\n';
+				//std::cout<<i<<" "<<"NOT"<<" "<<D.E_flip<<'\n';
 				D.flip_back();
 			}
 			else{
-				std::cout<<i<<" "<<"YES"<<" "<<D.E_flip<<'\n';
+				//std::cout<<i<<" "<<"YES"<<" "<<D.E_flip<<'\n';
 				D.E = D.E_flip;
 			}
 		}

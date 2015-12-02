@@ -31,7 +31,8 @@ int main (int argc, char **argv){
     ("cplex,x", "solve by cplex")
     ("clique,q", "find clique cuts")
     ("asat,a", "solve by asat")
-    ("oldasat,o", "solve by old asat");
+    ("oldasat,o", "solve by old asat")
+    ("print,p", "print problen");
 
 
 		po::variables_map vm;
@@ -69,11 +70,10 @@ int main (int argc, char **argv){
 			if(vm.count("clique")){
 			
 				auto v = find_clique(A);
-
-				
 				write(v);
 
 			}
+			if(vm.count("print")) A.print_problem();
 			if(vm.count("oldasat")) std::vector<int> t = old_asat(A,seed,0.21);
 			if(vm.count("asat")) std::vector<int> t = solve_by_asat(A,seed,0.21);
 			
