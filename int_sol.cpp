@@ -2,9 +2,10 @@
 
 ILOSTLBEGIN
 
-static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A);
+static bool solve_cuts(const sat_prob &A, const std::vector<std::tuple<int,int,int,int> > &v);
+static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, const sat_prob &A);
 static bool integer_test(const std::vector<double> &v);
-static bool integer_solution(const sat_prob &A);
+static bool integer_solution(sat_prob &A);
 
 
 void test_for_int(const int v,const int c,const int k,const int r,const int s, const bool e){
@@ -31,9 +32,41 @@ void test_for_int(const int v,const int c,const int k,const int r,const int s, c
 
 }
 
+void test_w_cuts(const int v,const int c,const int k,const int r,const int s, const bool e){
+	
+	boost::random::mt19937 gen(s);
+	
+	std::cout<<"#clauses: "<<c<<'\n';
+	std::cout<<"#variables: "<<v<<'\n';
+	std::cout<<"#runs: "<<r<<'\n';
+	
+	for(auto i = 0; i<r;++i){
+	
+		sat_prob A(v,c);
+		randomize_prob(A, gen, k);
 
+		auto start = std::chrono::high_resolution_clock::now();
+		bool test = integer_solution(A);
+		auto end = std::chrono::high_resolution_clock::now();		
+		std::chrono::duration<double> diff = end-start;
+		
+		auto greatest_connectivity1 = gcon1(A);
+		auto greatest_connectivity2 = gcon2(A);
+		
+		if(test)
+			std::cout<<i<<" "<<test<<" "<<greatest_connectivity1<<" "<<greatest_connectivity2<<" "<<diff.count()<<'\n';			
+		else{
+			start = std::chrono::high_resolution_clock::now();
+			bool t = solve_cuts(A,find_clique(A));
+			end = std::chrono::high_resolution_clock::now();	
+			diff = end-start;
+			std::cout<<i<<" "<<t<<" "<<greatest_connectivity1<<" "<<greatest_connectivity2<<" "<<diff.count()<<'\n';	
+		}
+	}
 
-static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, sat_prob A){
+}
+
+static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, const sat_prob &A){
 	IloEnv env = model.getEnv();
    
 	IloObjective obj = IloMaximize(env);   
@@ -73,7 +106,7 @@ static bool integer_test(const std::vector<double> &v){
   return true;  
 }
 
-static bool integer_solution(const sat_prob &A){
+static bool integer_solution(sat_prob &A){
 
 	IloEnv   env;
 	IloNumArray vals(env);
@@ -92,16 +125,16 @@ static bool integer_solution(const sat_prob &A){
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
 		
 		cplex.solve(); 
-
-		
 		cplex.getValues(vals, var);
+		
 		//env.out() << "Values:\n" << vals << endl;
 
-			
 	}
 	catch (IloException &e) {
-		env.error() << "Failed to optimize LP" << endl;
- 		cerr << "Concert exception caught: " << e <<'\n';
+		boost::random::mt19937 gen(time(NULL)+getpid());
+		A = sat_prob(A.get_num_variables(), A.get_num_clauses());
+		randomize_prob(A, gen, 3);
+		return integer_solution(A);
 	} 
 	catch (...) {cerr << "Unknown exception caught" <<'\n';}
 	
@@ -112,3 +145,64 @@ static bool integer_solution(const sat_prob &A){
 	
 	return integer_test(out);
 }
+
+
+static bool solve_cuts(const sat_prob &A, const std::vector<std::tuple<int,int,int,int> > &v){
+
+	IloEnv   lp;
+	IloNumArray vals(lp);
+	try{
+	
+		IloModel model(lp);
+
+		IloNumVarArray var(lp);
+		IloRangeArray con(lp);
+
+		populatebynonzero (model, var, con, A);
+		
+		for(size_t n = 0; n<v.size(); ++n){
+			
+			if(std::get<0>(v[n]) == 1 && std::get<1>(v[n]) == 1){		
+				IloConstraint cons(var[std::get<2>(v[n])]+var[std::get<3>(v[n])] <= 1);
+				model.add(cons); 
+			}
+			else if(std::get<0>(v[n]) == 1 && std::get<1>(v[n]) == 0){		
+				IloConstraint cons(var[std::get<2>(v[n])]-var[std::get<3>(v[n])] <= 0);
+				model.add(cons); 
+			}		
+			else if(std::get<0>(v[n]) == 0 && std::get<1>(v[n]) == 1){		
+				IloConstraint cons(var[std::get<3>(v[n])]-var[std::get<2>(v[n])] <= 0);
+				model.add(cons); 
+			}
+			else{
+				IloConstraint cons(-var[std::get<2>(v[n])]-var[std::get<3>(v[n])] <= -1);
+				model.add(cons); 				
+			}
+		}
+		
+		IloCplex cplex(model);	
+		cplex.setOut(lp.getNullStream());
+		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
+		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		
+		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
+		
+		cplex.solve(); 
+		cplex.getValues(vals, var);
+	}
+	catch (IloException &e) {
+		lp.error() << "Failed to optimize LP" << endl;
+ 		cerr << "Concert exception caught: " << e <<'\n';
+	} 
+	catch (...) {cerr << "Unknown exception caught" <<'\n';}
+	
+	std::vector<double> out(vals.getSize());
+	for(size_t i=0; i<out.size(); ++i)
+  	out[i] = vals[i];
+
+	lp.end(); 
+	
+	return integer_test(out);
+}
+
+

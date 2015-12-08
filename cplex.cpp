@@ -56,7 +56,7 @@ void solve_by_cplex(const sat_prob &A){
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int i = cplex.solve(); 
-		cplex.exportModel("LP.lp");
+		//cplex.exportModel("LP.lp");
 		
 		if (!i){
 			lp.out() << "Solution status = " << cplex.getStatus() << endl;
@@ -108,7 +108,7 @@ void solve_by_cplex(const sat_prob &A){
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int j = cplex.solve(); 
-		cplex.exportModel("ILP.lp");
+		//cplex.exportModel("ILP.lp");
 		
 		if (!j){
 			ilp.out() << "Solution status = " << cplex.getStatus() << endl;
@@ -147,4 +147,76 @@ void solve_by_cplex(const sat_prob &A){
 	catch (...) {cerr << "Unknown exception caught" <<'\n';}
 	
 	ilp.end(); 
+}
+
+
+
+void solve_w_cuts(const sat_prob &A, const std::vector<std::tuple<int,int,int,int> > &v){
+
+	IloEnv   lp;
+
+	try{
+	
+		IloModel model(lp);
+
+		IloNumVarArray var(lp);
+		IloRangeArray con(lp);
+
+		populatebynonzero (model, var, con, A);
+		
+		for(size_t n = 0; n<v.size(); ++n){
+			
+			if(std::get<0>(v[n]) == 1 && std::get<1>(v[n]) == 1){		
+				IloConstraint cons(var[std::get<2>(v[n])]+var[std::get<3>(v[n])] <= 1);
+				model.add(cons); 
+			}
+			else if(std::get<0>(v[n]) == 1 && std::get<1>(v[n]) == 0){		
+				IloConstraint cons(var[std::get<2>(v[n])]-var[std::get<3>(v[n])] <= 0);
+				model.add(cons); 
+			}		
+			else if(std::get<0>(v[n]) == 0 && std::get<1>(v[n]) == 1){		
+				IloConstraint cons(var[std::get<3>(v[n])]-var[std::get<2>(v[n])] <= 0);
+				model.add(cons); 
+			}
+			else{
+				IloConstraint cons(-var[std::get<2>(v[n])]-var[std::get<3>(v[n])] <= -1);
+				model.add(cons); 				
+			}
+		}
+		
+		IloCplex cplex(model);	
+		cplex.setOut(lp.getNullStream());
+		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
+		cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+		
+		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
+		
+		int i = cplex.solve(); 
+		cplex.exportModel("LP.lp");
+		
+		if (!i){
+			lp.out() << "Solution status = " << cplex.getStatus() << endl;
+		}
+
+
+		else{
+			IloNumArray vals(lp);
+			IloNumArray slaks(lp);
+			
+			cplex.getValues(vals, var);
+  		cplex.getSlacks(slaks, con);
+  		
+			lp.out() << "Solution status = " << cplex.getStatus() << endl;
+			//lp.out() << "Slacks = " << slaks << '\n';
+			lp.out() << "LP values        = " << vals << "\n\n";
+		}
+		
+	}
+	catch (IloException &e) {
+		lp.error() << "Failed to optimize LP" << endl;
+ 		cerr << "Concert exception caught: " << e <<'\n';
+	} 
+	catch (...) {cerr << "Unknown exception caught" <<'\n';}
+	
+	lp.end(); 
 }

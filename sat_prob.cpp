@@ -77,11 +77,6 @@ void sat_prob::add_clause(clause const& f){
 	problem.push_back(f);
 }
 
-void sat_prob::add_cut(cut const& c){
-	cut_pool.push_back(c);
-	num_cuts = cut_pool.size();
-}
-
 void sat_prob::print_problem(){
 	for (size_t i = 0; i<problem.size();++i){
 		std::cout<<"c"<<i<<": ";
@@ -100,7 +95,6 @@ unsigned int sat_prob::problem_size(){return problem.size();}
 
 void sat_prob::set_num_variables(unsigned int x){num_variables=x;}
 unsigned int sat_prob::get_num_clauses() const {return num_clauses;}
-unsigned int sat_prob::get_num_cuts() const {return cut_pool.size();}
 unsigned int sat_prob::get_num_variables() const {return num_variables;}
 double sat_prob::get_probability() const {return probability;}
 

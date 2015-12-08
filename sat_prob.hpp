@@ -52,7 +52,6 @@ public:
 	void set_num_variables (unsigned int x);
 	unsigned int get_num_clauses() const;
 	unsigned int get_num_variables() const;
-	unsigned int get_num_cuts() const;
 	double get_probability() const;
 	
 	int range_value(std::size_t i) const;
