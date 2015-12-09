@@ -20,8 +20,8 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 	}
 
 	for(unsigned int i = 0; i<A.get_num_clauses();++i){
-		for(unsigned int k = 0; k<A.get_clause(i).get_num_literals();++k){
-		
+		c[i].setLinearCoef(x[4], 0.0);
+		for(unsigned int k = 0; k<A.get_clause(i).get_num_literals();++k){		
 				if(A.get_clause(i).get_literal(k)<0)
 					c[i].setLinearCoef(x[-A.get_clause(i).get_literal(k)-1],-1.0);
 				else
@@ -29,6 +29,9 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 		
 		}
 	}
+	/*c.add(IloRange(env, 0, 0));
+	c[13].setLinearCoef(x[4], 1.0);
+	c[13].setName("hier");*/
 	
 	//model.add(obj);
   model.add(c);
@@ -43,6 +46,7 @@ void solve_by_cplex(const sat_prob &A){
 		IloModel model(lp);
 
 		IloNumVarArray var(lp);
+		
 		IloRangeArray con(lp);
 
 		populatebynonzero (model, var, con, A);
@@ -56,7 +60,7 @@ void solve_by_cplex(const sat_prob &A){
 		//cplex.setParam(IloCplex::Param::MIP::Limits::Nodes,0);
 		
 		int i = cplex.solve(); 
-		//cplex.exportModel("LP.lp");
+		cplex.exportModel("LP.lp");
 		
 		if (!i){
 			lp.out() << "Solution status = " << cplex.getStatus() << endl;

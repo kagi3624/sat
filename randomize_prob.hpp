@@ -12,6 +12,7 @@
 #include <math.h> 
 #include <algorithm>
 #include <iterator>
+#include <map>
 #include <unordered_set>
 #include "sat_prob.hpp"
 

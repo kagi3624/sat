@@ -10,12 +10,13 @@ static bool integer_solution(sat_prob &A);
 
 void test_for_int(const int v,const int c,const int k,const int r,const int s, const bool e){
 
-	boost::random::mt19937 gen(s);
+	boost::random::mt19937 gen;
 	
 	std::cout<<"#clauses: "<<c<<'\n';
 	std::cout<<"#variables: "<<v<<'\n';
 	std::cout<<"#runs: "<<r<<'\n';
 		for(auto i = 0; i<r;++i){
+			gen.seed(s+i);
 			sat_prob A(v,c);
 			randomize_prob(A, gen, k);
 			
@@ -24,17 +25,14 @@ void test_for_int(const int v,const int c,const int k,const int r,const int s, c
 			auto end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double> diff = end-start;
 			
-			auto greatest_connectivity1 = gcon1(A);
-			auto greatest_connectivity2 = gcon2(A);
-			
-			std::cout<<i<<" "<<test<<" "<<greatest_connectivity1<<" "<<greatest_connectivity2<<" "<<diff.count()<<'\n';
+			std::cout<<s+i<<" "<<test<<" "<<diff.count()<<" "<<'\n';
 		}
 
 }
 
 void test_w_cuts(const int v,const int c,const int k,const int r,const int s, const bool e){
 	
-	boost::random::mt19937 gen(s);
+	boost::random::mt19937 gen;
 	
 	std::cout<<"#clauses: "<<c<<'\n';
 	std::cout<<"#variables: "<<v<<'\n';
@@ -42,6 +40,7 @@ void test_w_cuts(const int v,const int c,const int k,const int r,const int s, co
 	
 	for(auto i = 0; i<r;++i){
 	
+		gen.seed(s+i);
 		sat_prob A(v,c);
 		randomize_prob(A, gen, k);
 
@@ -50,17 +49,14 @@ void test_w_cuts(const int v,const int c,const int k,const int r,const int s, co
 		auto end = std::chrono::high_resolution_clock::now();		
 		std::chrono::duration<double> diff = end-start;
 		
-		auto greatest_connectivity1 = gcon1(A);
-		auto greatest_connectivity2 = gcon2(A);
-		
 		if(test)
-			std::cout<<i<<" "<<test<<" "<<greatest_connectivity1<<" "<<greatest_connectivity2<<" "<<diff.count()<<'\n';			
+			std::cout<<i<<" "<<test<<" "<<diff.count()<<" "<<s+i<<'\n';			
 		else{
 			start = std::chrono::high_resolution_clock::now();
 			bool t = solve_cuts(A,find_clique(A));
 			end = std::chrono::high_resolution_clock::now();	
 			diff = end-start;
-			std::cout<<i<<" "<<t<<" "<<greatest_connectivity1<<" "<<greatest_connectivity2<<" "<<diff.count()<<'\n';	
+			std::cout<<i<<" "<<t<<" "<<diff.count()<<" "<<s+i<<'\n';	
 		}
 	}
 
@@ -131,10 +127,8 @@ static bool integer_solution(sat_prob &A){
 
 	}
 	catch (IloException &e) {
-		boost::random::mt19937 gen(time(NULL)+getpid());
-		A = sat_prob(A.get_num_variables(), A.get_num_clauses());
-		randomize_prob(A, gen, 3);
-		return integer_solution(A);
+		env.error() << "Failed to optimize LP" << endl;
+ 		cerr << "Concert exception caught: " << e <<'\n';
 	} 
 	catch (...) {cerr << "Unknown exception caught" <<'\n';}
 	

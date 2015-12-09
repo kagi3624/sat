@@ -24,7 +24,7 @@ int main (int argc, char **argv){
     ("variables,v", po::value<int>(&num_variables), "set number of variables")
     ("literals,k", po::value<int>(&num_literals)->default_value(3), "set number of maximum literals")
     ("clauses,c", po::value<int>(&num_clauses), "set number of clauses")
-    ("seed,s", po::value<int>(&seed)->default_value(1337), "set number of the seed (default is random)")
+    ("seed,s", po::value<int>(&seed)->default_value(0), "set number of the seed (default is random)")
     ("exact,e", "set every clause to exact length of given literals")
     ("grsf3,g", "generate a guaranteed satisfiable 3SAT problem")
     ("cplex,x", "solve by cplex")

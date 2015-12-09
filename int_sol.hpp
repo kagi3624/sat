@@ -13,7 +13,6 @@
 #include <boost/random/mersenne_twister.hpp>
 #include "cliq.hpp"
 #include "randomize_prob.hpp"
-#include "gcon.hpp"
 #include <chrono>
 #include <ctime>
 

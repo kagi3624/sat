@@ -16,38 +16,6 @@ void clause::print_clause(){
 	}
 };
 
-void cut::print_cut(){
-
-	try{
-		if(left.size()==0) throw "Error: left-hand side empty!";
-
-		
-		for(size_t i = 0; i<left.size();++i){
-			if(i == 0 && left[0]>0){
-				std::cout<<'x'<<left[0]-1;
-				continue;
-			}
-			if(left[i]<0)
-				std::cout<<"-x"<<-left[i]-1;
-			else
-				std::cout<<"+x"<<left[i]-1;
-		}
-		if(relation==eq) 
-			std::cout<<"=";
-		else if(relation==lesser)
-			std::cout<<"<";
-		else if(relation==greater)
-			std::cout<<">";
-		else throw "Error: relation not set!";
-		
-		std::cout<<right<<'\n';
-	}
-	catch(char const* s){
-		std::cerr<<s<<'\n';
-	}
-}
-
-
 void clause::add_literal (int const &x){
 	if(x==0) std::cerr<<"literal indexing beginns with 1!\n";
 	else{
@@ -82,15 +50,10 @@ void sat_prob::print_problem(){
 		std::cout<<"c"<<i<<": ";
 		problem[i].print_clause();		
 	}
-	for(size_t i = 0; i<cut_pool.size();++i){
-		std::cout<<"cut"<<i<<": ";
-		cut_pool[i].print_cut();
-	}
-};
+}
 
 
 clause sat_prob::get_clause(size_t i) const {return problem[i];}
-cut sat_prob::get_cut(size_t i) const {return cut_pool[i];}
 unsigned int sat_prob::problem_size(){return problem.size();}
 
 void sat_prob::set_num_variables(unsigned int x){num_variables=x;}
@@ -109,5 +72,11 @@ int sat_prob::range_value(std::size_t i) const{
 sat_prob::sat_prob(unsigned int x, unsigned int y, double p): num_variables(x), num_clauses(y), probability(p){
 
 	problem.reserve(num_clauses);
+
+}
+
+void sat_prob::clear(){
+	
+	problem.clear();
 
 }
