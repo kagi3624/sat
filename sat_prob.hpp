@@ -2,7 +2,9 @@
 #define sat_prob_HPP
 
 #include <vector>
+#include <set>
 #include <iostream>
+#include <boost/iterator/counting_iterator.hpp>
 
 struct clause{
 	std::vector <int> v;
@@ -24,6 +26,7 @@ struct clause{
 
 class sat_prob{
   std::vector<clause> problem;
+  std::set<unsigned int> unbound_vars;
 	unsigned int num_variables, num_clauses;
 	double probability; 
    
@@ -33,6 +36,9 @@ public:
 	clause get_clause(size_t i) const;
 	unsigned int problem_size();
 	void print_problem();
+	
+	void find_unbound_vars();
+	//std::set get_unbound_vars() const;
 	
 	void set_num_variables (unsigned int x);
 	unsigned int get_num_clauses() const;

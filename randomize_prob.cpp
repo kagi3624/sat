@@ -2,8 +2,6 @@
 
 using namespace boost::random;
 
-bool is_valid(sat_prob &A);
-
 bool vec_not_stored(sat_prob &A, std::vector<int> &T){
 	if(A.problem_size()==0)
 		return true;
@@ -46,8 +44,6 @@ void randomize_prob(sat_prob &A, boost::random::mt19937 &gen, unsigned int num_l
 		std::vector<int> T;
 		fill_vec(T, num_var);
 
-
-
 		if(num_lit==0){
 			uniform_int_distribution<int> random_num_literals(1,num_var);
 			for(unsigned int n = 0; n<num_cl;++n){
@@ -88,36 +84,17 @@ void randomize_prob(sat_prob &A, boost::random::mt19937 &gen, unsigned int num_l
 			}
 		}
 		else{
-			int count = 0;
-		//	do{
-				//A.clear();
 				for(unsigned int n = 0; n<num_cl;++n){
 					clause a(num_lit);		
 					partial_shuffle(T.begin(), T.begin()+num_lit, T.end(), gen);
 					a.v.assign(T.begin(),T.begin()+num_lit); 
 					random_flip(a.v,A.get_probability(),gen);	
 					A.add_clause(a);
-				//	++count;
-					//std::cout<<count<<'\n';
 				}
-		//	} while (!is_valid(A));	
+			A.find_unbound_vars();	
 		}
 	}
 	catch(char const* s){
 		std::cerr<<s<<'\n';
 	}
-}
-
-bool is_valid(sat_prob &A){
-	
-	std::map <int,int> M;
-	
-	for(size_t i = 0; i<A.get_num_clauses(); ++i)
-	for(size_t j = 0; j<A.get_clause(i).get_num_literals();++j){
-		
-		M[abs(A.get_clause(i).get_literal(j))]++;
-	}
-	if(M.size() == A.get_num_variables())
-		return true;
-	return false;
 }

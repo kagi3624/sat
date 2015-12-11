@@ -29,11 +29,7 @@ static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c
 		
 		}
 	}
-	/*c.add(IloRange(env, 0, 0));
-	c[13].setLinearCoef(x[4], 1.0);
-	c[13].setName("hier");*/
 	
-	//model.add(obj);
   model.add(c);
 }
 
@@ -42,7 +38,7 @@ void solve_by_cplex(const sat_prob &A){
 	IloEnv   lp;
 
 	try{
-	
+		
 		IloModel model(lp);
 
 		IloNumVarArray var(lp);
@@ -103,6 +99,7 @@ void solve_by_cplex(const sat_prob &A){
 		
 		IloCplex cplex(model);
 		
+		
 		//cplex.setOut(ilp.getNullStream());
 		cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
 		//cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
@@ -145,7 +142,7 @@ void solve_by_cplex(const sat_prob &A){
 		
 	}
 	catch (IloException &e) {
-		ilp.error() << "Failed to optimize LP" << endl;
+		ilp.error() << "Failed to optimize MIP" << endl;
  		cerr << "Concert exception caught: " << e <<'\n';
 	} 
 	catch (...) {cerr << "Unknown exception caught" <<'\n';}

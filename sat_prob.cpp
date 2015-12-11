@@ -53,6 +53,24 @@ void sat_prob::print_problem(){
 }
 
 
+void sat_prob::find_unbound_vars(){
+
+	unbound_vars.insert(boost::counting_iterator<int>(1), boost::counting_iterator<int>(num_variables+1));
+	
+	for(size_t i = 0; i<problem.size();++i)
+	for(size_t j = 0; j<problem[i].get_num_literals();++j){
+		
+		unbound_vars.erase(abs(problem[i].get_literal(j)));
+	
+	}
+	/*for(const int &t : unbound_vars)
+		std::cout<<t<<'\n'; */
+}
+//std::set sat_prob::get_unbound_vars() const{
+//	return unbound_vars;
+//}
+
+
 clause sat_prob::get_clause(size_t i) const {return problem[i];}
 unsigned int sat_prob::problem_size(){return problem.size();}
 
