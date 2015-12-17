@@ -38,7 +38,7 @@ public:
 	void print_problem();
 	
 	void find_unbound_vars();
-	//std::set get_unbound_vars() const;
+	std::set<unsigned int> get_unbound_vars() const;
 	
 	void set_num_variables (unsigned int x);
 	unsigned int get_num_clauses() const;

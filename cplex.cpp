@@ -47,6 +47,9 @@ void solve_by_cplex(const sat_prob &A){
 
 		populatebynonzero (model, var, con, A);
 		
+		for(auto i:A.get_unbound_vars())
+			model.add(var[i-1]);
+		
 		IloCplex cplex(model);
 		
 		cplex.setOut(lp.getNullStream());
@@ -96,6 +99,10 @@ void solve_by_cplex(const sat_prob &A){
 		IloRangeArray con(ilp);
 
 		populatebynonzero (model, var, con, A, false);
+		
+		for(auto i:A.get_unbound_vars())
+			model.add(var[i-1]);
+		
 		
 		IloCplex cplex(model);
 		

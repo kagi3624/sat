@@ -70,7 +70,7 @@ int main (int argc, char **argv){
 			if(vm.count("clique")){
 			
 				auto v = find_clique(A);
-				solve_w_cuts(A,v);
+				//solve_w_cuts(A,v);
 				write(v);
 
 			}

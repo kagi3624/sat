@@ -39,6 +39,9 @@ std::vector<std::tuple<int,int,int,int> > find_clique(const sat_prob &A){
 			}
       
       model.add(con);
+      
+			for(auto i:A.get_unbound_vars())
+				model.add(var[i-1]);
        
       for(unsigned int i = 0; i<A.get_num_variables()-1;++i)
       for(unsigned int j = i+1; j<A.get_num_variables();++j){

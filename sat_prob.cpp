@@ -63,12 +63,10 @@ void sat_prob::find_unbound_vars(){
 		unbound_vars.erase(abs(problem[i].get_literal(j)));
 	
 	}
-	/*for(const int &t : unbound_vars)
-		std::cout<<t<<'\n'; */
 }
-//std::set sat_prob::get_unbound_vars() const{
-//	return unbound_vars;
-//}
+std::set<unsigned int> sat_prob::get_unbound_vars() const{
+	return unbound_vars;
+}
 
 
 clause sat_prob::get_clause(size_t i) const {return problem[i];}
