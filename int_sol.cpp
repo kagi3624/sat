@@ -115,6 +115,9 @@ static bool integer_solution(sat_prob &A){
 
 		populatebynonzero (model, var, con, A);
 		
+		for(auto i:A.get_unbound_vars())
+			model.add(var[i-1]);
+		
 		IloCplex cplex(model);
 		
 		cplex.setOut(env.getNullStream());
