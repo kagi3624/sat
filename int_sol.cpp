@@ -56,7 +56,7 @@ void test_w_cuts(const int v,const int c,const int k,const int r,const int s, co
 			bool t = solve_cuts(A,find_clique(A));
 			end = std::chrono::high_resolution_clock::now();	
 			diff = end-start;
-			std::cout<<i<<" "<<t<<" "<<diff.count()<<" "<<s+i<<'\n';	
+			std::cout<<s+i<<" "<<t<<" "<<diff.count()<<'\n';	
 		}
 	}
 
@@ -156,6 +156,9 @@ static bool solve_cuts(const sat_prob &A, const std::vector<std::tuple<int,int,i
 		IloRangeArray con(lp);
 
 		populatebynonzero (model, var, con, A);
+		
+		for(auto i:A.get_unbound_vars())
+			model.add(var[i-1]);
 		
 		for(size_t n = 0; n<v.size(); ++n){
 			

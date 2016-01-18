@@ -172,6 +172,9 @@ void solve_w_cuts(const sat_prob &A, const std::vector<std::tuple<int,int,int,in
 
 		populatebynonzero (model, var, con, A);
 		
+		for(auto i:A.get_unbound_vars())
+			model.add(var[i-1]);
+		
 		for(size_t n = 0; n<v.size(); ++n){
 			
 			if(std::get<0>(v[n]) == 1 && std::get<1>(v[n]) == 1){		
@@ -222,6 +225,7 @@ void solve_w_cuts(const sat_prob &A, const std::vector<std::tuple<int,int,int,in
 	}
 	catch (IloException &e) {
 		lp.error() << "Failed to optimize LP" << endl;
+		cerr << "blah blah hier fail!\n";
  		cerr << "Concert exception caught: " << e <<'\n';
 	} 
 	catch (...) {cerr << "Unknown exception caught" <<'\n';}

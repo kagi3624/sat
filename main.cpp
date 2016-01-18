@@ -3,6 +3,7 @@
 #include "cliq.hpp"
 #include "old_asat.hpp"
 #include "rsf3.hpp"
+#include "gcon.hpp"
 
 #include <boost/program_options.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -26,7 +27,8 @@ int main (int argc, char **argv){
     ("clauses,c", po::value<int>(&num_clauses), "set number of clauses")
     ("seed,s", po::value<int>(&seed)->default_value(0), "set number of the seed (default is random)")
     ("exact,e", "set every clause to exact length of given literals")
-    ("grsf3,g", "generate a guaranteed satisfiable 3SAT problem")
+    ("gcon,g", "get greatest connectivity")
+    ("grsf3,f", "generate a guaranteed satisfiable 3SAT problem")
     ("cplex,x", "solve by cplex")
     ("clique,q", "find clique cuts")
     ("asat,a", "solve by asat")
@@ -51,13 +53,13 @@ int main (int argc, char **argv){
 		
 		if(num_literals !=3 && vm.count("grsf3")) throw "grsf3 is for 3SAT only!";
 		
-		if(!vm.count("cplex")&&!vm.count("asat")&&!vm.count("oldasat")&&!vm.count("clique")) throw "select at least one solver!";
-
+		if(!vm.count("cplex")&&!vm.count("asat")&&!vm.count("oldasat")&&!vm.count("clique")&&!vm.count("gcon")) throw "select at least one solver!";
+			
 		if(vm.count("cplex")&& vm.count("runs"))
 			test_for_int(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
 		else if(vm.count("clique")&& vm.count("runs"))
 			test_w_cuts(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
-		else if(vm.count("clique")||vm.count("cplex")||vm.count("asat")||vm.count("oldasat")){
+		else if(vm.count("clique")||vm.count("cplex")||vm.count("asat")||vm.count("oldasat")||vm.count("gcon")){
 			sat_prob A(num_variables,num_clauses);
 			
 			if(vm.count("grsf3"))
@@ -70,14 +72,14 @@ int main (int argc, char **argv){
 			if(vm.count("clique")){
 			
 				auto v = find_clique(A);
-				//solve_w_cuts(A,v);
-				write(v);
+				solve_w_cuts(A,v);
+				//write(v);
 
 			}
 			if(vm.count("print")) A.print_problem();
 			if(vm.count("oldasat")) std::vector<int> t = old_asat(A,seed,0.21);
 			if(vm.count("asat")) std::vector<int> t = solve_by_asat(A,seed,0.21);
-
+			if(vm.count("gcon")) gcon_test(A);
 		}
 	}
 	

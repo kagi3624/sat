@@ -7,6 +7,7 @@
 
 #include "sat_prob.hpp"
 #include <cmath>
+#include <iomanip> 
 #include <lemon/connectivity.h>
 #include <lemon/concepts/graph_components.h>
 #include <lemon/list_graph.h>

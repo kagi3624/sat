@@ -76,7 +76,10 @@ void gcon_test(const sat_prob &A){
 	int g1 = gcon1(A);
 	int g2 = gcon2(A);
 	
-	std::cout<<"#clauses: "<<A.get_num_clauses()<<'\n';
-	std::cout<<"#variables: "<<A.get_num_variables()<<'\n';
-	std::cout<<g1<<" "<<g2<<'\n';
+	//std::cout<<"#clauses: "<<A.get_num_clauses()<<'\n';
+	//std::cout<<"#variables: "<<A.get_num_variables()<<'\n';
+	std::cout<<std::setprecision(8)
+					 <<(double)A.get_num_clauses()/A.get_num_variables()<<" "
+					 <<(double)g1/(A.get_num_clauses()+A.get_num_variables())<<" "
+					 <<(double)g2/(A.get_num_clauses()+2*A.get_num_variables())<<'\n';
 }
