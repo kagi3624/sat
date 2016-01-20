@@ -5,6 +5,8 @@
 #include "rsf3.hpp"
 #include "gcon.hpp"
 
+#include "a_test.hpp"
+
 #include <boost/program_options.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <ctime>
@@ -58,7 +60,8 @@ int main (int argc, char **argv){
 		if(vm.count("cplex")&& vm.count("runs"))
 			test_for_int(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
 		else if(vm.count("clique")&& vm.count("runs"))
-			test_w_cuts(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
+			//test_w_cuts(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
+			tt(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
 		else if(vm.count("clique")||vm.count("cplex")||vm.count("asat")||vm.count("oldasat")||vm.count("gcon")){
 			sat_prob A(num_variables,num_clauses);
 			
@@ -73,7 +76,7 @@ int main (int argc, char **argv){
 			
 				auto v = find_clique(A);
 				solve_w_cuts(A,v);
-				//write(v);
+				write(v);
 
 			}
 			if(vm.count("print")) A.print_problem();

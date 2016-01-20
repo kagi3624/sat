@@ -24,7 +24,6 @@ void test_for_int(const int v,const int c,const int k,const int r,const int s, c
 			bool test = integer_solution(A);
 			auto end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double> diff = end-start;
-			
 			std::cout<<s+i<<" "<<test<<" "<<diff.count()<<" "<<'\n';
 		}
 
@@ -50,7 +49,7 @@ void test_w_cuts(const int v,const int c,const int k,const int r,const int s, co
 		std::chrono::duration<double> diff = end-start;
 		
 		if(test)
-			std::cout<<i<<" "<<test<<" "<<diff.count()<<" "<<s+i<<'\n';			
+			std::cout<<s+i<<" "<<test<<" "<<diff.count()<<'\n';			
 		else{
 			start = std::chrono::high_resolution_clock::now();
 			bool t = solve_cuts(A,find_clique(A));
@@ -59,7 +58,6 @@ void test_w_cuts(const int v,const int c,const int k,const int r,const int s, co
 			std::cout<<s+i<<" "<<t<<" "<<diff.count()<<'\n';	
 		}
 	}
-
 }
 
 static void populatebynonzero (IloModel model, IloNumVarArray x, IloRangeArray c, const sat_prob &A){
@@ -203,6 +201,4 @@ static bool solve_cuts(const sat_prob &A, const std::vector<std::tuple<int,int,i
 	lp.end(); 
 	
 	return integer_test(out);
-}
-
-
+}	
