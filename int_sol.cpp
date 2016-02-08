@@ -52,7 +52,7 @@ void test_w_cuts(const int v,const int c,const int k,const int r,const int s, co
 			std::cout<<s+i<<" "<<test<<" "<<diff.count()<<'\n';			
 		else{
 			start = std::chrono::high_resolution_clock::now();
-			bool t = solve_cuts(A,find_clique(A));
+			bool t = solve_cuts(A,find_clique_v2(A));
 			end = std::chrono::high_resolution_clock::now();	
 			diff = end-start;
 			std::cout<<s+i<<" "<<t<<" "<<diff.count()<<'\n';	
@@ -202,3 +202,16 @@ static bool solve_cuts(const sat_prob &A, const std::vector<std::tuple<int,int,i
 	
 	return integer_test(out);
 }	
+
+void cliq_nums(const int v,const int c, const int k, const int s){
+	
+	boost::random::mt19937 gen;
+	gen.seed(s);
+	sat_prob A(v,c);
+	randomize_prob(A, gen, k);
+	
+	auto t = find_clique(A);
+	std::cout<<(double)c/v<<" "<<t.size()<<'\n';
+}
+
+

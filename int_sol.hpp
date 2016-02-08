@@ -21,4 +21,6 @@
 void test_for_int(const int v,const int c,const int k,const int r,const int s, const bool e);
 void test_w_cuts(const int v,const int c,const int k,const int r,const int s, const bool e);
 
+void cliq_nums(const int v,const int c,const int k, const int s);
+
 #endif 

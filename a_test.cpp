@@ -11,7 +11,7 @@ void tt(const int v,const int c,const int k,const int r,const int s, const bool 
 		sat_prob A(v,c);
 		randomize_prob(A, gen, k);
 
-		auto N = find_clique(A);
+		auto N = find_clique_v2(A);
 		auto end = std::chrono::high_resolution_clock::now();
 		
 		std::chrono::duration<double> diff = end-start;

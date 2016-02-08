@@ -5,7 +5,6 @@
 #include "rsf3.hpp"
 #include "gcon.hpp"
 
-#include "a_test.hpp"
 
 #include <boost/program_options.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -32,10 +31,11 @@ int main (int argc, char **argv){
     ("gcon,g", "get greatest connectivity")
     ("grsf3,f", "generate a guaranteed satisfiable 3SAT problem")
     ("cplex,x", "solve by cplex")
-    ("clique,q", "find clique cuts")
+    ("clique,q", "solve with clique cuts")
+    ("cliq_nums,t", "find number of cliques")
     ("asat,a", "solve by asat")
     ("oldasat,o", "solve by old asat")
-    ("print,p", "print problen")
+    ("print,p", "print problem")
     ("runs,r", po::value<int>(&runs), "number of runs for simulation");
 
 
@@ -55,13 +55,14 @@ int main (int argc, char **argv){
 		
 		if(num_literals !=3 && vm.count("grsf3")) throw "grsf3 is for 3SAT only!";
 		
-		if(!vm.count("cplex")&&!vm.count("asat")&&!vm.count("oldasat")&&!vm.count("clique")&&!vm.count("gcon")) throw "select at least one solver!";
+		if(!vm.count("cplex")&&!vm.count("asat")&&!vm.count("oldasat")&&!vm.count("clique")&&!vm.count("gcon")&&!vm.count("cliq_nums")) throw "select at least one operation: -g, -t, -c, -q, -o, -a!";
 			
 		if(vm.count("cplex")&& vm.count("runs"))
 			test_for_int(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
 		else if(vm.count("clique")&& vm.count("runs"))
-			//test_w_cuts(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
-			tt(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
+			test_w_cuts(num_variables, num_clauses, num_literals, runs, seed, !vm.count("exact"));
+		else if(vm.count("cliq_nums"))
+			cliq_nums(num_variables, num_clauses,num_literals, seed);
 		else if(vm.count("clique")||vm.count("cplex")||vm.count("asat")||vm.count("oldasat")||vm.count("gcon")){
 			sat_prob A(num_variables,num_clauses);
 			
@@ -75,8 +76,11 @@ int main (int argc, char **argv){
 			if(vm.count("clique")){
 			
 				auto v = find_clique(A);
-				solve_w_cuts(A,v);
+				auto w = find_clique_v2(A);
+				//solve_w_cuts(A,v);
 				write(v);
+				std::cout<<'\n';
+				write(w);
 
 			}
 			if(vm.count("print")) A.print_problem();
